@@ -1,0 +1,9 @@
+[submodule "submodules/ffxiv-lodestone-item-id"]
+	path = submodules/ffxiv-lodestone-item-id
+	url = https://github.com/Asvel/ffxiv-lodestone-item-id
+[submodule "submodules/ffxiv-datamining"]
+	path = submodules/ffxiv-datamining
+	url = https://github.com/xivapi/ffxiv-datamining
+[submodule "submodules/ffxiv-teamcraft"]
+	path = submodules/ffxiv-teamcraft
+	url = https://github.com/ffxiv-teamcraft/ffxiv-teamcraft
