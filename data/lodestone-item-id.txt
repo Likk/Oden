@@ -1,0 +1,1 @@
+../submodules/ffxiv-lodestone-item-id/lodestone-item-id.txt
