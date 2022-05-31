@@ -23,7 +23,7 @@ use warnings;
 sub run {
     my $class = shift;
     my $hear  = shift;
-    return $hear =~ m{^(A(?:re)*|R)(?:\s*)(Y(?:ou)*|U)(?:\s*)T(?:here)?(?:\?)?$}i ? '[yes]' : '';
+    return $hear =~ m{^([/!])?(A(?:re)*|R)(?:\s*)(Y(?:ou)*|U)(?:\s*)T(?:here)?(?:\?)?$}i ? '[yes]' : '';
 }
 
 1;
