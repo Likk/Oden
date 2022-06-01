@@ -16,7 +16,11 @@ on 'develop' => sub {
 };
 
 on 'test' => sub {
+    # ./t layer
     requires 'Test::More';
+    requires 'Test::Spec';
+
+    # ./xt layer
     requires 'Test::Perl::Critic';
     requires 'Test::Pod';
     requires 'Test::Spelling';
