@@ -36,6 +36,10 @@ sub run {
         $talk .= sprintf("lodestone: %s\n",   $lodestone_url)   if $lodestone_url;
         $talk .= sprintf("miraprisnap: %s\n", $miraprisnap_url) if $miraprisnap_url;
     }
+
+    elsif(my $candidate = Oden::Model::Item->search_prefix_match_name_ja($hear)){
+        $talk = sprintf("maybe:\n%s", join("\n", @$candidate));
+    }
     return $talk;
 }
 

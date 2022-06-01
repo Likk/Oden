@@ -4,6 +4,7 @@ requires 'Config::Pit';
 
 # chat operations.
 requires 'JSON::XS';
+#requires 'JSON::Parse';
 requires 'URI::Escape';
 
 ## AnyEvent::Discord dependencys

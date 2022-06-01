@@ -40,7 +40,7 @@ describe 'about Oden::Model::Item#lookup_item_by_name_ja' => sub {
         it 'when returns item object' => sub {
             my $instance    = Oden::Model::Item->new;
             my $item_object = $instance->lookup_item_by_name_ja('アラグ錫貨');
-            isa_ok $item, 'Oden::Model::Item';
+            isa_ok $item_object, 'Oden::Model::Item';
         };
     };
 };

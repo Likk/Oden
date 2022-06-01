@@ -24,9 +24,16 @@ describe 'about Oden::Command::ItemSearch#run' => sub {
         };
     };
 
+    context 'case call run method with prefix of official name_ja' => sub {
+        it 'when returns item object' => sub {
+            my $res = Oden::Command::ItemSearch->run('アラグ');
+            like $res, qr{^maybe:\n};
+        };
+    };
+
     context 'case call run method with un official name_ja' => sub {
         it 'when returns item object' => sub {
-            my $res = Oden::Command::ItemSearch->run('錫貨');
+            my $res = Oden::Command::ItemSearch->run('そんなものはない');
             is $res, undef;
         };
     };
