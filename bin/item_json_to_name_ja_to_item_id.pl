@@ -10,7 +10,7 @@ use Encode;
 
 =head1 SYNOPSIS
 
-  ./env.sh bin/item_json_to_name_ja_to_item_id.pl > data/name_ja_to_item_id.pl
+  ./env.sh perl bin/item_json_to_name_ja_to_item_id.pl > data/name_ja_to_item_id.pl
 
 =cut
 
