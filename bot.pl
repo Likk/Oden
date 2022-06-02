@@ -4,7 +4,18 @@ use utf8;
 
 use AnyEvent::Discord;
 use Config::Pit qw/pit_get/;
+use Encode;
 use Oden;
+
+=head1 NAME
+
+  bot.pl
+
+=head1 SYNOPSIS
+
+  ./env.sh perl bot.pl
+
+=cut
 
 my $config = pit_get("discord", require => {
     "token" => q{set your bot application's token},
@@ -25,7 +36,7 @@ $bot->on('message_create', sub {
     # bot には反応しない
     return if $data->{author}->{bot};
 
-    warn sprintf("%s#%s:%s", $username, $channel_id, $content);
+    warn Encode::encode_utf8(sprintf("%s#%s:%s", $username, $channel_id, $content));
     my $res = $oden->talk($content);
     $client->send($data->{channel_id}, $res) if $res
 });
