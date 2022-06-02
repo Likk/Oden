@@ -1,19 +1,18 @@
 package Oden::Model::Item;
+use autodie;
 use strict;
 use warnings;
+use utf8;
 use 5.30.2;
 use Encode;
 use FindBin;
 
-#XXX: Can't use an undefined value as a subroutine reference at local/lib/perl5/AnyEvent/Discord.pm line 276.
-# use JSON::Parse  qw/read_json/;
-
-use JSON::XS /decode_json/;
+use JSON::XS qw/decode_json/;
 use URI::Escape;
 
 =head1 NAME
 
-  Oden::Model::Item - lookup item lodestone by name_ja.
+Oden::Model::Item - lookup item lodestone by name_ja.
 
 =head1 DESCRIPTION
 
@@ -21,13 +20,37 @@ use URI::Escape;
 
 =cut
 
+# loading data on use.
+
 our $DATA_DIR;
 our $NAME_JA_TO_ITEM_ID;
 our $ITEM_ID_TO_NAME;
+our $NAME_TO_ITEM_ID;
+
+sub import {
+    my $class  = __PACKAGE__;
+    my $caller = caller(0);
+
+    $DATA_DIR            = './data';
+    $NAME_JA_TO_ITEM_ID  = do sprintf("%s/name_ja_to_item_id.pl", $DATA_DIR)
+      or die 'cant read name_ja_to_item_id';
+
+    $ITEM_ID_TO_NAME     = decode_json($class->_read_json(sprintf("%s/items.json", $DATA_DIR)));
+
+    for my $id (keys %$ITEM_ID_TO_NAME){
+        my $value = $ITEM_ID_TO_NAME->{$id};
+        for my $lang (keys %$value){
+            $NAME_TO_ITEM_ID->{$value->{$lang}} = +{
+                id   => $id,
+                lang => $lang,
+            };
+        }
+    }
+}
 
 =head1 CONSTRUCTOR AND STARTUP METHODS
 
-=head1 new
+=head2 new
 
   Creates and returns a Item Object
 
@@ -37,7 +60,6 @@ sub new {
     my ($class) = @_;
 
     my $self = bless {}, $class;
-    $self->_build;
     return $self;
 }
 
@@ -47,21 +69,20 @@ sub new {
 
 =cut
 
-# TODO: name_en, de, and fr.
-#
-sub lookup_item_by_name_ja {
-    my ($invocant, $name_ja) = @_;
-    return unless $name_ja;
+sub lookup_item_by_name {
+    my ($invocant, $name) = @_;
+    return unless $name;
 
     my $self = ref $invocant eq 'Oden::Model::Item'
       ? $invocant
       : $invocant->new;
     ;
 
-    # tentative ( encoded utf8 or flagged utf8, that is the question)
-    $self->{name_ja} = $name_ja;
-    $self->{id}      = $NAME_JA_TO_ITEM_ID->{Encode::encode_utf8($name_ja)}
-      or return;
+    return unless $NAME_TO_ITEM_ID->{$name};
+
+    $self->{name} = $name;
+    $self->{id}   = $NAME_TO_ITEM_ID->{$name}->{id};
+    $self->{lang} = $NAME_TO_ITEM_ID->{$name}->{lang};
     return $self;
 }
 
@@ -104,7 +125,12 @@ sub lodestone_url {
     chomp $lodestone_id;
 
     return unless $lodestone_id;
-    return sprintf("https://jp.finalfantasyxiv.com/lodestone/playguide/db/item/%s/", $lodestone_id);
+    my $lang =
+        $self->{lang} eq 'ja' ? 'jp'
+      : $self->{lang} eq 'en' ? 'na'
+      : $self->{lang}
+    ;
+    return sprintf("https://%s.finalfantasyxiv.com/lodestone/playguide/db/item/%s/", $lang, $lodestone_id);
 }
 
 =head2 miraprisnap_url
@@ -113,24 +139,22 @@ sub lodestone_url {
 
 sub miraprisnap_url {
     my $self = shift;
-    my $uri_escape_name_ja = URI::Escape::uri_escape_utf8($self->{name_ja});
+    my $name_ja            = $ITEM_ID_TO_NAME->{$self->{id}}->{ja};
+    my $uri_escape_name_ja = URI::Escape::uri_escape_utf8($name_ja);
     return sprintf("https://mirapri.com/?keyword=%s", $uri_escape_name_ja);
 }
 
 
 =head1 PRIVATE METHDOS
 
-=head2 _build
+=head2 _read_json
+
+XXX: Can't use JSON::Parse#read_json
+```
+  an undefined value as a subroutine reference at local/lib/perl5/AnyEvent/Discord.pm line 276.
+```
 
 =cut
-
-sub _build {
-    my $self = shift;
-    $DATA_DIR           = "./data";
-    $NAME_JA_TO_ITEM_ID = do sprintf("%s/name_ja_to_item_id.pl", $DATA_DIR)
-      or die 'cant read name_ja_to_item_id';
-    $ITEM_ID_TO_NAME    = decode_json($self->_read_json(sprintf("%s/items.json", $DATA_DIR)));
-}
 
 sub _read_json {
     my ($self, $file) = @_;
@@ -140,4 +164,5 @@ sub _read_json {
     close $fh;
     return $json;
 }
+
 1;

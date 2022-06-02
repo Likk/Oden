@@ -30,7 +30,7 @@ sub run {
 
     return unless $hear;
     my $talk;
-    if(my $item = Oden::Model::Item->lookup_item_by_name_ja($hear)){
+    if(my $item = Oden::Model::Item->lookup_item_by_name($hear)){
         my $lodestone_url   = $item->lodestone_url;
         my $miraprisnap_url = $item->miraprisnap_url;
         $talk .= sprintf("lodestone: %s\n",   $lodestone_url)   if $lodestone_url;
