@@ -5,6 +5,7 @@ use warnings;
 use utf8;
 use 5.30.2;
 use Encode;
+use Fcntl    qw/O_RDONLY/;
 use FindBin;
 use JSON::XS qw/decode_json/;
 use Tie::File;
@@ -157,10 +158,8 @@ sub _item_hash_id {
     my $self = shift;
     my $file_path = sprintf("%s/%s", $DATA_DIR, 'lodestone-item-id.txt');
     open (my $fh, '<', $file_path);
-    tie my @rows, 'Tie::File', $fh;
+    tie my @rows, 'Tie::File', $fh, mode => O_RDONLY, autochomp => 1;
     my $hash_id = $rows[$self->{id} - 1]; #array start 0 but file line start 1
-    chomp $hash_id;
-    close $fh;
     return $hash_id;
 }
 
