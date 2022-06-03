@@ -37,7 +37,7 @@ sub run {
         $talk .= sprintf("miraprisnap: %s\n", $miraprisnap_url) if $miraprisnap_url;
     }
 
-    elsif(my $candidate = Oden::Model::Item->search_prefix_match_name_ja($hear)){
+    elsif(my $candidate = Oden::Model::Item->search_prefix_match_name($hear)){
         $talk = sprintf("maybe:\n%s", join("\n", @$candidate));
     }
     return $talk;

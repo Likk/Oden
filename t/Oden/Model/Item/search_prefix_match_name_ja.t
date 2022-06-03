@@ -12,14 +12,14 @@ describe 'about Oden::Model::Item#search_prefix_match_name_ja' => sub {
 
     context 'case call search_prefix_match_name_ja methods without arguments' => sub {
         it 'when returns undef' => sub {
-            my $res = Oden::Model::Item->new->search_prefix_match_name_ja;
+            my $res = Oden::Model::Item->new->search_prefix_match_name;
             is $res, undef;
         };
     };
 
-    context 'case call search_prefix_match_name_ja methods with name_ja' => sub {
+    context 'case call search_prefix_match_name_ja methods with name (ja)' => sub {
         it 'when returns official item name list' => sub {
-            my $res    = [sort(@{ Oden::Model::Item->new->search_prefix_match_name_ja('アラグ') })];
+            my $res    = [sort(@{ Oden::Model::Item->new->search_prefix_match_name('アラグ') })];
             my $expect = [sort(qw/
                 アラグの樹脂
                 アラグの上級硬化薬

@@ -32,9 +32,6 @@ sub import {
     my $caller = caller(0);
 
     $DATA_DIR            = './data';
-    $NAME_JA_TO_ITEM_ID  = do sprintf("%s/name_ja_to_item_id.pl", $DATA_DIR)
-      or die 'cant read name_ja_to_item_id';
-
     $ITEM_ID_TO_NAME     = decode_json($class->_read_json(sprintf("%s/items.json", $DATA_DIR)));
 
     for my $id (keys %$ITEM_ID_TO_NAME){
@@ -88,23 +85,26 @@ sub lookup_item_by_name {
 
 =head1 GUESS ITEM NAME METHDOS
 
-=head2 search_prefix_match_name_ja
+=head2 search_prefix_match_name
 
 =cut
 
 # TODO: name_en, de, and fr.
 #
-sub search_prefix_match_name_ja {
-    my ($self, $name_ja) = @_;
-    return unless $name_ja;
+sub search_prefix_match_name {
+    my ($self, $name) = @_;
+    return unless $name;
 
-    my $candidate = [grep {
-        $_ =~ m/^$name_ja/;
+    my $candidate;
+    for my $lang (qw/ja en fr de/){
+        $candidate = [grep {
+            $_ =~ m/^$name/;
+        }
+        map {
+            $_->{$lang}
+        } values %$ITEM_ID_TO_NAME];
+        last if scalar @$candidate;
     }
-    map {
-        $_->{ja}
-    } values %$ITEM_ID_TO_NAME];
-
     return unless scalar @$candidate;
     return $candidate;
 }
