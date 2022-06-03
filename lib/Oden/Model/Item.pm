@@ -6,8 +6,8 @@ use utf8;
 use 5.30.2;
 use Encode;
 use FindBin;
-
 use JSON::XS qw/decode_json/;
+use Tie::File;
 use URI::Escape;
 
 =head1 NAME
@@ -121,7 +121,7 @@ sub lodestone_url {
 
     # TODO: should not use awk.
     my $find_lodestone_item_id_command = sprintf("awk 'NR==%s' %s/%s", $self->{id}, $DATA_DIR, 'lodestone-item-id.txt');
-    my $lodestone_id = `$find_lodestone_item_id_command`;
+    my $lodestone_id = $self->_item_hash_id;
     chomp $lodestone_id;
 
     return unless $lodestone_id;
@@ -146,6 +146,23 @@ sub miraprisnap_url {
 
 
 =head1 PRIVATE METHDOS
+
+=head1 _item_hash_id
+
+it to lodestone hash id
+
+=cut
+
+sub _item_hash_id {
+    my $self = shift;
+    my $file_path = sprintf("%s/%s", $DATA_DIR, 'lodestone-item-id.txt');
+    open (my $fh, '<', $file_path);
+    tie my @rows, 'Tie::File', $fh;
+    my $hash_id = $rows[$self->{id} - 1]; #array start 0 but file line start 1
+    chomp $hash_id;
+    close $fh;
+    return $hash_id;
+}
 
 =head2 _read_json
 
