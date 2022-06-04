@@ -84,7 +84,7 @@ sub lookup_item_by_name {
     return $self;
 }
 
-=head1 GUESS ITEM NAME METHDOS
+=head1 GUESS ITEM NAME METHODS
 
 =head2 search_prefix_match_name
 
@@ -110,7 +110,7 @@ sub search_prefix_match_name {
     return $candidate;
 }
 
-=head1 ITEM METHDOS
+=head1 ITEM METHODS
 
 =head2 lodestone_url
 
@@ -146,7 +146,7 @@ sub miraprisnap_url {
 }
 
 
-=head1 PRIVATE METHDOS
+=head1 PRIVATE METHODS
 
 =head1 _item_hash_id
 
