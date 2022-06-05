@@ -37,17 +37,18 @@ sub import {
     $DATA_DIR            = $ENV{DATA_DIR} || './data';
     $ITEM_ID_TO_NAME     = decode_json($class->_read_json(sprintf("%s/items.json", $DATA_DIR)));
 
-    for my $id (keys %$ITEM_ID_TO_NAME){
-        my $value = $ITEM_ID_TO_NAME->{$id};
-        for my $lang (keys %$value){
-            $NAME_TO_ITEM_ID->{$value->{$lang}} = +{
-                id   => $id,
-                lang => $lang,
-            };
+    unless (scalar keys %$NAME_TO_ITEM_ID){
+        for my $id (keys %$ITEM_ID_TO_NAME){
+            my $value = $ITEM_ID_TO_NAME->{$id};
+            for my $lang (keys %$value){
+                $NAME_TO_ITEM_ID->{$value->{$lang}} = +{
+                    id   => $id,
+                    lang => $lang,
+                };
+            }
         }
     }
-
-    {
+    unless (scalar keys %$ITEM_DATA ){
         my $csv       = Text::CSV->new (+{ binary => 1, sep_char => ",",});
         my $file_path = sprintf("%s/%s", $DATA_DIR, 'Item.csv');
         my $index     = 1;
