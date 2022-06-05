@@ -9,6 +9,7 @@ use URI::Escape;
 
 use Oden::Command::AYT;
 use Oden::Dispatcher;
+use Oden::Preload;
 
 =head1 NAME
 
