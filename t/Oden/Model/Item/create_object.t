@@ -74,4 +74,6 @@ describe 'about Oden::Model::Item#lookup_item_by_name' => sub {
 
 };
 
-runtests unless caller;
+# XXX: forkprove has caller
+# runtests unless caller;
+runtests();

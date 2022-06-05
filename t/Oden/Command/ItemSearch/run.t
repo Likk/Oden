@@ -40,4 +40,6 @@ describe 'about Oden::Command::ItemSearch#run' => sub {
 
 };
 
-runtests unless caller;
+# XXX: forkprove has caller
+# runtests unless caller;
+runtests();

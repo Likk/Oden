@@ -42,4 +42,6 @@ describe 'about Oden::Model::Item#search_prefix_match_name_ja' => sub {
 
 };
 
-runtests unless caller;
+# XXX: forkprove has caller
+# runtests unless caller;
+runtests();

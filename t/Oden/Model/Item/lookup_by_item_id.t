@@ -3,7 +3,7 @@ use warnings;
 use utf8;
 
 use Test::Spec;
-
+use Test::More;
 use Oden::Model::Item;
 
 describe 'about Oden::Model::Item#lookup_item_by_id' => sub {
@@ -21,4 +21,6 @@ describe 'about Oden::Model::Item#lookup_item_by_id' => sub {
     };
 };
 
-runtests unless caller;
+# XXX: forkprove has caller
+# runtests unless caller;
+runtests();

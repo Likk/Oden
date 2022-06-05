@@ -120,4 +120,6 @@ describe 'about Oden::Model::Item#miraprisnap_url ja' => sub {
 
 };
 
-runtests unless caller;
+# XXX: forkprove has caller
+# runtests unless caller;
+runtests();

@@ -18,6 +18,7 @@ on 'develop' => sub {
 };
 
 on 'test' => sub {
+    requires 'App::ForkProve';
     # ./t layer
     requires 'Test::More';
     requires 'Test::Spec';
