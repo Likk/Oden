@@ -102,4 +102,22 @@ describe 'about Oden::Model::Item#(.+)_url fr' => sub {
 
 };
 
+
+describe 'about Oden::Model::Item#miraprisnap_url ja' => sub {
+    my $hash;
+    share %$hash;
+
+    before all => sub {
+        $hash->{item} = Oden::Model::Item->lookup_item_by_name('アンティークメイル');
+    };
+
+    context 'case call miraprisnap_url' => sub {
+        it 'when returns undef. it is not equipment item' => sub {
+            my $url = $hash->{item}->miraprisnap_url;
+            is $url, undef;
+        };
+    };
+
+};
+
 runtests unless caller;

@@ -20,7 +20,7 @@ describe 'about Oden::Command::ItemSearch#run' => sub {
     context 'case call run method with official name_ja' => sub {
         it 'when returns item object' => sub {
             my $res = Oden::Command::ItemSearch->run('アラグ錫貨');
-            like $res, qr{^lodestone:\shttps://jp.finalfantasyxiv.com/lodestone/(.*)?/\nmiraprisnap:\shttps://mirapri.com/\?keyword=(.*)?$};
+            like $res, qr{^lodestone:\shttps://jp.finalfantasyxiv.com/lodestone/(.*)?/$};
         };
     };
 

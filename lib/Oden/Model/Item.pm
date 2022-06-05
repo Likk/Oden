@@ -8,6 +8,7 @@ use Encode;
 use Fcntl    qw/O_RDONLY/;
 use FindBin;
 use JSON::XS qw/decode_json/;
+use Text::CSV;
 use Tie::File;
 use URI::Escape;
 
@@ -27,12 +28,13 @@ our $DATA_DIR;
 our $NAME_JA_TO_ITEM_ID;
 our $ITEM_ID_TO_NAME;
 our $NAME_TO_ITEM_ID;
+our $ITEM_DATA;
 
 sub import {
     my $class  = __PACKAGE__;
     my $caller = caller(0);
 
-    $DATA_DIR            = './data';
+    $DATA_DIR            = $ENV{DATA_DIR} || './data';
     $ITEM_ID_TO_NAME     = decode_json($class->_read_json(sprintf("%s/items.json", $DATA_DIR)));
 
     for my $id (keys %$ITEM_ID_TO_NAME){
@@ -43,6 +45,33 @@ sub import {
                 lang => $lang,
             };
         }
+    }
+
+    {
+        my $csv       = Text::CSV->new (+{ binary => 1, sep_char => ",",});
+        my $file_path = sprintf("%s/%s", $DATA_DIR, 'Item.csv');
+        my $index     = 1;
+        my $header    = [];
+        open (my $fh, '<', $file_path);
+        while(my $row = $csv->getline($fh)){
+            next if $index == 1;
+            next if $index == 3;
+            next if $index == 4;
+
+            $header     = $row if $index == 2;
+
+            my $data;
+            foreach my $column_number (0 .. $#{$header}){
+                my $key = $header->[$column_number] || $column_number;
+                $data->{$key} = $row->[$column_number];
+            }
+            $ITEM_DATA->{$data->{'#'}} = $data;
+        }
+        continue {
+            $index++;
+        }
+
+        close $fh;
     }
 }
 
@@ -81,6 +110,33 @@ sub lookup_item_by_name {
     $self->{name} = $name;
     $self->{id}   = $NAME_TO_ITEM_ID->{$name}->{id};
     $self->{lang} = $NAME_TO_ITEM_ID->{$name}->{lang};
+    $self->_item_data();
+    return $self;
+}
+
+=head2 lookup_item_by_id
+
+  Creates and returns a Item object from name_ja
+
+=cut
+
+sub lookup_item_by_id {
+    my ($invocant, $id) = @_;
+    return unless $id;
+
+    my $self = ref $invocant eq 'Oden::Model::Item'
+      ? $invocant
+      : $invocant->new;
+    ;
+
+    my $item = $ITEM_ID_TO_NAME->{$id};
+    return unless $item;
+
+    $self->{name} = $item->{en};
+    $self->{id}   = $id;
+    $self->{lang} = 'en';
+
+    $self->_item_data();
     return $self;
 }
 
@@ -120,8 +176,6 @@ sub lodestone_url {
     my $self = shift;
     my $data_dir = $DATA_DIR;
 
-    # TODO: should not use awk.
-    my $find_lodestone_item_id_command = sprintf("awk 'NR==%s' %s/%s", $self->{id}, $DATA_DIR, 'lodestone-item-id.txt');
     my $lodestone_id = $self->_item_hash_id;
     chomp $lodestone_id;
 
@@ -140,17 +194,40 @@ sub lodestone_url {
 
 sub miraprisnap_url {
     my $self = shift;
+
+    return unless $self->is_equipment;
+
     my $name_ja            = $ITEM_ID_TO_NAME->{$self->{id}}->{ja};
     my $uri_escape_name_ja = URI::Escape::uri_escape_utf8($name_ja);
     return sprintf("https://mirapri.com/?keyword=%s", $uri_escape_name_ja);
 }
 
+=head2 is_equipment
+
+  It item is equipment any job, class.
+  SEE ALSO: ffxiv.pf-n.co/xivapi?url=%2FEquipSlotCategory
+
+=cut
+
+sub is_equipment {
+    my $self = shift;
+    my $equip_slot_categorys = [
+    # MainHand, OffHand, Head,  Body,   Gloves, Waist,  Legs,   Feet,   Ears,   Neck,   Wrists, Finger[LR], SoulCrystal
+      1,        2,       3,     4,      5,      6,      7,      8,      9,      10,     11,     12,         17,
+    # Any Combined equipment
+    13..16, 18..21
+    ];
+    my $is_equipment = scalar grep {
+        $self->{EquipSlotCategory} == $_;
+    } @$equip_slot_categorys;
+    return $is_equipment;
+}
 
 =head1 PRIVATE METHODS
 
 =head1 _item_hash_id
 
-it to lodestone hash id
+  id to lodestone hash id
 
 =cut
 
@@ -161,6 +238,21 @@ sub _item_hash_id {
     tie my @rows, 'Tie::File', $fh, mode => O_RDONLY, autochomp => 1;
     my $hash_id = $rows[$self->{id} - 1]; #array start 0 but file line start 1
     return $hash_id;
+}
+
+=head1 _item_data
+
+  item's detail data.
+
+=cut
+
+sub _item_data {
+    my $self = shift;
+
+    my $item_data = $ITEM_DATA->{$self->{id}};
+    for my $key(keys %$item_data){
+        $self->{$key} = $item_data->{$key};
+    }
 }
 
 =head2 _read_json

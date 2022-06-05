@@ -4,8 +4,9 @@ requires 'Config::Pit';
 
 # chat operations.
 requires 'JSON::XS';
-#requires 'JSON::Parse';
+requires 'Text::CSV';
 requires 'URI::Escape';
+
 
 ## AnyEvent::Discord dependencys
 requires 'LWP::Protocol::https';
