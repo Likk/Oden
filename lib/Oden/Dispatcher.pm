@@ -7,6 +7,7 @@ use Module::Load;
 our $DISPATCH = +{
     'itemsearch' => 'ItemSearch',
     'isearch'    => 'ItemSearch',
+    'fishing'    => 'Fishing',
 };
 
 sub dispatch {
