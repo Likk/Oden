@@ -189,6 +189,15 @@ sub lodestone_url {
     return sprintf("https://%s.finalfantasyxiv.com/lodestone/playguide/db/item/%s/", $lang, $lodestone_id);
 }
 
+=head2 ffxivteamcraft_url
+
+=cut
+
+sub ffxivteamcraft_url {
+    my $self = shift;
+    return sprintf("https://ffxivteamcraft.com/db/%s/item/%s/", $self->{lang}, $self->{id});
+}
+
 =head2 miraprisnap_url
 
 =cut
@@ -222,6 +231,15 @@ sub is_equipment {
         $self->{EquipSlotCategory} == $_;
     } @$equip_slot_categorys;
     return $is_equipment;
+}
+
+=head2 is_fishable
+
+=cut
+
+sub is_fishable {
+    my $self = shift;
+    return $self->{ItemUICategory} == 47 ? 1 : 0
 }
 
 =head1 PRIVATE METHODS
