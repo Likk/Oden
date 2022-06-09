@@ -13,8 +13,8 @@ describe 'about Oden::API::Universalis#current_data' => sub {
     context 'case call current_data method' => sub {
         it 'when returns sales data' => sub {
             my $res = Oden::API::Universalis->current_data(+{
-                item_ids => [36213],
-                world    => 'zeromus',
+                item_ids    => [36213],
+                world_or_dc => 'zeromus',
             });
             ok $res;
         };
