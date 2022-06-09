@@ -8,6 +8,7 @@ our $DISPATCH = +{
     'itemsearch' => 'ItemSearch',
     'isearch'    => 'ItemSearch',
     'fishing'    => 'Fishing',
+    'market'     => 'MarketBoard',
 };
 
 sub dispatch {
