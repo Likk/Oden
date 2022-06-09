@@ -145,10 +145,10 @@ sub lookup_item_by_id {
 
 =head2 search_prefix_match_name
 
+  return prefix match item name list.
+
 =cut
 
-# TODO: name_en, de, and fr.
-#
 sub search_prefix_match_name {
     my ($self, $name) = @_;
     return unless $name;
@@ -171,6 +171,8 @@ sub search_prefix_match_name {
 
 =head2 lodestone_url
 
+  provide lodestone url from item.
+
 =cut
 
 sub lodestone_url {
@@ -191,6 +193,8 @@ sub lodestone_url {
 
 =head2 ffxivteamcraft_url
 
+  provide ffxivteamcraft url from item.
+
 =cut
 
 sub ffxivteamcraft_url {
@@ -199,6 +203,8 @@ sub ffxivteamcraft_url {
 }
 
 =head2 miraprisnap_url
+
+  provide miraprisnap url from item.
 
 =cut
 
@@ -235,12 +241,26 @@ sub is_equipment {
 
 =head2 is_fishable
 
+  return true if It item can be caught(hooking/giging).
+
 =cut
 
 sub is_fishable {
     my $self = shift;
     return $self->{ItemUICategory} == 47 ? 1 : 0
 }
+
+=head2 is_tradable
+
+  return true if It item can be traded.
+
+=cut
+
+sub is_tradable {
+    my $self = shift;
+    return ($self->{IsUntradable} eq 'False') ? 1 : 0;
+}
+
 
 =head1 PRIVATE METHODS
 
