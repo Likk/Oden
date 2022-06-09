@@ -6,7 +6,8 @@ requires 'Config::Pit';
 requires 'JSON::XS';
 requires 'Text::CSV';
 requires 'URI::Escape';
-
+requires 'Furl';
+requires 'Time::Piece';
 
 ## AnyEvent::Discord dependencys
 requires 'LWP::Protocol::https';
