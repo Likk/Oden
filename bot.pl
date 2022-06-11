@@ -6,6 +6,7 @@ use AnyEvent::Discord;
 use Config::Pit qw/pit_get/;
 use Encode;
 use Oden;
+use JSON::XS;
 
 =head1 NAME
 
@@ -36,8 +37,9 @@ $bot->on('message_create', sub {
     # bot には反応しない
     return if $data->{author}->{bot};
 
-    warn Encode::encode_utf8(sprintf("%s#%s:%s", $username, $channel_id, $content));
-    my $res = $oden->talk($content);
+    warn JSON::XS::encode_json($data);
+
+    my $res = $oden->talk($content, $data->{guild_id}, $username);
     $client->send($data->{channel_id}, $res) if $res
 });
 
