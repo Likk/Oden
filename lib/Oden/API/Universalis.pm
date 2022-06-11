@@ -52,6 +52,7 @@ use Time::Piece;
 =item B<stats_within>
 
   string (query) The amount of time before now to calculate stats over, in milliseconds. By default, this is 7 days.
+
 =item B<entries_within>
 
   string (query) The amount of time before now to take entries within, in seconds. Negative values will be ignored.
