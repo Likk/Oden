@@ -48,7 +48,7 @@ sub new {
 =cut
 
 sub talk {
-    my ($self, $content) = @_;
+    my ($self, $content, $guild_id, $username) = @_;
 
     my $res;
 
@@ -59,10 +59,10 @@ sub talk {
 
     if($content =~ m{^/(\w+)?\s(.*)}){
         my $command = $1;
-        my $message = $2;
-
+        my $message = $content;
+        $message =~ s{/$1\s}{};
         my $package = Oden::Dispatcher->dispatch($command) or return;
-        $res = $package->run($message)
+        $res = $package->run($message, $guild_id, $username);
     }
     return $res;
 }

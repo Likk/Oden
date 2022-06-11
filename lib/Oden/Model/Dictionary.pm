@@ -16,13 +16,14 @@ Oden::Model::Dictionary
 
 =head1 SINOPSYS
 
-  my $dictionary =  Oden::Model::Dictionary->new({ channel_id => xxxx });
-  $dictionary-<>set( )
+  my $dictionary =  Oden::Model::Dictionary->new({ file_name=> xxxx });
+  $dictionary->set( foo => 'bar');
+  print $dictionary->get('foo'); # bar
 
 =head1 CAUTION
 
-  this module has critical bug.
-  dictionary file do not support file lock system.
+  This module has critical bug.
+  dictionary file does not support file locking.
   I plan on dealing with it within a few days.
 
 =head1 CONSTRUCTOR AND STARTUP METHODS
@@ -41,8 +42,8 @@ sub new {
     $opt            ||=+{};
     $opt->{dic_dir} ||= $dic_dir;
 
-    die 'require channel_id option. Oden::Model::Dictionary->new({ channel_id => xxxx })'
-      unless $opt->{channel_id};
+    die 'require file_name option. Oden::Model::Dictionary->new({ file_name => xxxx })'
+      unless $opt->{file_name};
 
     my $self = bless $opt, $class;
     return $self;
@@ -120,7 +121,7 @@ sub _dictionary {
 
 sub _file {
     my ($self) = @_;
-    my $file = sprintf("%s/%s", $self->{dic_dir} , $self->{channel_id});
+    my $file = sprintf("%s/%s", $self->{dic_dir} , $self->{file_name});
     unless (-e $file){
         open my $fh, '>', $file;
         close $fh;

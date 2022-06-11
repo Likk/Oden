@@ -26,19 +26,23 @@ use Oden::API::Universalis;
 sub run {
     my $class      = shift;
     my $hear       = shift;
-    my $channel_id = shift;
+    my $guild_id = shift;
 
     return unless $hear;
 
     my $talk;
 
-    warn $hear;
     if($hear =~ m{(add|set|get|show)\s([^\s]+)(?:\s+)?(.*)?}){
         my $method = $1;
         my $key    = $2;
         my $value  = $3;
 
-        my $dict = Oden::Model::Dictionary->new({ channel_id => $channel_id});
+        my $dict = Oden::Model::Dictionary->new({ file_name => $guild_id});
+        # TODO: 
+        #   - `add` and `set` pattern will not overwrite to dictionary.
+        #   - provide `overwrite` pattern instead of `add` and `set` pattern
+        #   - provide `delete` pattern.
+
         if($method =~ m{(add|set)}){
             my $value = $hear;
             $value =~s{(add|set)\s$key\s*}{};
