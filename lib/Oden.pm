@@ -7,6 +7,7 @@ use Encode qw/encode_utf8/;
 use FindBin;
 use URI::Escape;
 
+use Oden::API::Discord;
 use Oden::Command::AYT;
 use Oden::Dispatcher;
 use Oden::Preload;
@@ -67,4 +68,12 @@ sub talk {
     return $res;
 }
 
+sub discord {
+    my $self = shift;
+    return $self->{discord} ||= do {
+        Oden::API::Discord->new(
+            token => $self->{token},
+        );
+    };
+}
 1;
