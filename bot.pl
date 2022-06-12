@@ -53,7 +53,8 @@ $bot->on('message_update', sub {
 
     warn JSON::XS::encode_json($data);
 
-    if($data->{flags} == 32            &&
+    if( $data->{flags}                 &&
+        $data->{flags} == 32           &&
         !defined $data->{member}       &&
         !defined $data->{author}->{id} &&
         !defined $data->{content}
