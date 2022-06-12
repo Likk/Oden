@@ -58,7 +58,7 @@ sub talk {
         return $res;
     }
 
-    if($content =~ m{^/(\w+)?\s(.*)}){
+    if($content =~ m{^/(\w+)?\s+(.*)}){
         my $command = $1;
         my $message = $content;
         $message =~ s{/$1\s}{};
