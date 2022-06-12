@@ -4,7 +4,7 @@ use warnings;
 use utf8;
 use autodie;
 use Encode;
-use Storable qw/nstore retrieve/;
+use Storable qw/lock_nstore lock_retrieve/;
 
 =head1 NAME
 
@@ -19,12 +19,6 @@ Oden::Model::Dictionary
   my $dictionary =  Oden::Model::Dictionary->new({ file_name=> xxxx });
   $dictionary->set( foo => 'bar');
   print $dictionary->get('foo'); # bar
-
-=head1 CAUTION
-
-  This module has critical bug.
-  dictionary file does not support file locking.
-  I plan on dealing with it within a few days.
 
 =head1 CONSTRUCTOR AND STARTUP METHODS
 
@@ -64,7 +58,7 @@ sub set {
 
     my $dictionary = $self->_dictionary;
     $dictionary->{$key} = $value;
-    nstore($dictionary, $self->_file());
+    lock_nstore($dictionary, $self->_file());
     return 1;
 }
 
@@ -79,9 +73,7 @@ sub get {
     return unless $key;
 
     my $dictionary = $self->_dictionary;
-    my $value = $dictionary->{$key};
-    nstore($dictionary, $self->_file());
-    return $value;
+    return $dictionary->{$key};
 }
 
 =head1 PRIVATE METHDOS
@@ -98,7 +90,7 @@ sub _dictionary {
     eval {
         my $file    = $self->_file;
         if(-s $file){
-            $dictionary = retrieve($file);
+            $dictionary = lock_retrieve($file);
         }
         else {
             $dictionary = +{};
@@ -128,5 +120,12 @@ sub _file {
     }
     return $file;
 }
+
+=head1 SEE ALSO
+
+  L<Storable>
+
+=cut
+
 
 1;
