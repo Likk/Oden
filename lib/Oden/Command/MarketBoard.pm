@@ -5,6 +5,7 @@ use 5.30.2;
 
 use Oden::Model::Item;
 use Oden::API::Universalis;
+use Number::Format;
 
 =head1 NAME
 
@@ -46,15 +47,20 @@ sub run {
 
         $talk .= sprintf("last update: %s\n",   $res->{lastUploadTime});
         for my $row (@{$res->{entry}}){
-            $talk .= sprintf("%s: price:%s, count:%s, %s\n",
-                $row->{worldName},
-                $row->{pricePerUnit},
-                $row->{quantity},
-                $row->{hq} ? '<:hq:983319334476742676>' : '',
-            );
+            $talk .= $class->_format($row, $world_or_dc);
         }
     }
     return $talk;
+}
+
+sub _format {
+    my ($class, $row, $world) = @_;
+    return sprintf ("`%-10s: Gil%11s x %3s`%s\n",
+        $row->{worldName} || $world,
+        Number::Format::format_price($row->{pricePerUnit}, 0, ''),
+        $row->{quantity},
+        $row->{hq} ? '<:hq:983319334476742676>' : '',
+    );
 }
 
 1;
