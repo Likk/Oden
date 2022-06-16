@@ -4,7 +4,7 @@ use warnings;
 
 use Furl;
 use HTTP::Request::Common;
-use JSON::XS qw/decode_json/;
+use JSON::XS qw/decode_json encode_json/;
 use Time::Piece;
 
 =head1 NAME
@@ -97,6 +97,35 @@ sub show_message {
     );
 }
 
+=head2
+
+    request create message with attachement file,
+
+=cut
+
+sub send_attached_file {
+    my ($self, $channel_id, $path, $filename) = @_;
+    $filename ||= $path;
+
+    my $endpoint = $self->{base_url} . sprintf("/channels/%s/messages", $channel_id);
+    my $req = POST(
+        $endpoint,
+        Content_Type    => 'multipart/form-data',
+        Authorization   => sprintf("Bot %s", $self->{token}),
+        User_Agent      => $self->_user_agent->agent,
+        Content         => [
+            file => [ $path => $filename]
+        ],
+    );
+
+    my $res = $self->_user_agent->request($req);
+    unless($res->is_success()){
+        warn $res->status_line;
+        return ;
+    }
+    return 1;
+}
+
 =head1 PRIVATE METHODS
 
 =head2 _request
@@ -112,6 +141,7 @@ sub _request {
     my $req = HTTP::Request->new('GET' => $endpoint,
         [
             Authorization => sprintf("Bot %s", $self->{token}),
+            User_Agent    => $self->_user_agent->agent,
         ],
         $params,
     );

@@ -32,8 +32,6 @@ my $discord =$oden->discord();
 
 $bot->on('message_create', sub {
     my ($client, $data) = @_;
-    my $channel_id = $client->channels->{$data->{channel_id}};
-    my $username   = $data->{author}->{username};
     my $content    = $data->{content};
 
     # bot には反応しない
@@ -41,8 +39,28 @@ $bot->on('message_create', sub {
 
     warn JSON::XS::encode_json($data);
 
-    my $res = $oden->talk($content, $data->{guild_id}, $username);
-    $client->send($data->{channel_id}, $res) if $res
+    my $res = $oden->talk(
+        $content,
+        $data->{guild_id},
+        $data->{author}->{username}
+    );
+
+    return unless($res);
+
+    # Oden からのレスポンスによって返答の挙動を変えたい
+    my $res_type = ref $res;
+
+    if($res_type eq 'HASH' && $res->{filename}){ #今のところファイル添付しかないけど、ファイル型にした方良さそう # Oden::Response::File ... ?
+        my $filename = $res->{filename};
+        undef $res; # $fh 開放してあげないと、ロックかかってるっぽくて添付できない
+        $discord->send_attached_file($data->{channel_id}, $filename, 'dictionary.tsv');
+
+        # 基本的に不要なはず
+        unlink $filename;
+    }
+    else { #型がなければ通常のテキスト返信
+        $client->send($data->{channel_id}, $res) if $res
+    }
 });
 
 $bot->on('message_update', sub {
@@ -50,9 +68,8 @@ $bot->on('message_update', sub {
 
     # bot には反応しない
     return if $data->{author}->{bot};
-
-    warn JSON::XS::encode_json($data);
-
+    # XXX: スレッド作成は message_update で送られてくる。
+    #      既存メッセージの更新がないのに、メッセージ更新でおくられくるもの、かつ flags が 32 (= has_thread )をスレッド作成として扱う
     if( $data->{flags}                 &&
         $data->{flags} == 32           &&
         !defined $data->{member}       &&

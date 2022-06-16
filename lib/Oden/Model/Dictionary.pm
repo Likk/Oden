@@ -4,7 +4,9 @@ use warnings;
 use utf8;
 use autodie;
 use Encode;
-use Storable qw/lock_nstore lock_retrieve/;
+use File::Temp qw/tempfile/;
+use Storable   qw/lock_nstore lock_retrieve/;
+use Text::CSV_XS;
 
 =head1 NAME
 
@@ -45,6 +47,41 @@ sub new {
 
 =head2 METHODS
 
+=head2 file
+
+  create tsv file from dictionary.
+
+=cut
+
+sub file {
+    my ($self) = @_;
+
+    my ($fh, $filename) = tempfile(SUFFIX => '.tsv', UNLINK => 0 );
+    my $tsv        = Text::CSV_XS->new(+{
+        binary   => 1,
+        sep_char => "\t",
+        eol      => "\n",
+    });
+
+    my $dictionary = $self->_dictionary;
+
+
+    $tsv->combine(['key','value']);
+    $fh->print();
+    for my $key (sort keys %$dictionary) {
+        my $value = $dictionary->{$key};
+        chomp $value;
+        my $row = [$key, $value];
+        $tsv->combine(@$row) or die $tsv->error_diag();
+        $fh->print(Encode::encode_utf8($tsv->string()));
+    }
+
+    return +{
+        fh       => $fh,
+        filename => $filename,
+    };
+}
+
 =head2  set
 
   set key-value data on dictionary.
@@ -57,7 +94,46 @@ sub set {
     return unless $value;
 
     my $dictionary = $self->_dictionary;
+    return if delete $dictionary->{$key};
+
     $dictionary->{$key} = $value;
+    lock_nstore($dictionary, $self->_file());
+    return 1;
+}
+
+=head2  overwrite
+
+  overwrite key-value data on dictionary.
+
+=cut
+
+sub overwrite {
+    my ($self, $key, $value) = @_;
+    return unless $key;
+    return unless $value;
+
+    my $dictionary = $self->_dictionary;
+    return unless delete $dictionary->{$key};
+
+    $dictionary->{$key} = $value;
+    lock_nstore($dictionary, $self->_file());
+    return 1;
+}
+
+=head2 remove
+
+ remove value from key on dictionary.
+
+=cut
+
+sub remove {
+    my ($self, $key) = @_;
+    return unless $key;
+
+    my $dictionary = $self->_dictionary;
+    my $value = delete $dictionary->{$key};
+    return unless $value;
+
     lock_nstore($dictionary, $self->_file());
     return 1;
 }
@@ -75,6 +151,25 @@ sub get {
     my $dictionary = $self->_dictionary;
     return $dictionary->{$key};
 }
+
+=head2 move
+
+  rename key on dictionary.
+
+=cut
+
+sub move {
+    my ($self, $before, $after) = @_;
+
+    my $dictionary = $self->_dictionary;
+    my $value = delete $dictionary->{$before};
+    return unless $value;
+
+    $dictionary->{$after} = $value;
+    lock_nstore($dictionary, $self->_file());
+    return 1;
+}
+
 
 =head1 PRIVATE METHDOS
 

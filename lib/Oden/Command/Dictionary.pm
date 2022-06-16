@@ -32,31 +32,48 @@ sub run {
 
     my $talk;
 
-    if($hear =~ m{(add|set|get|show)\s([^\s]+)(?:\s+)?(.*)?}){
-        my $method = $1;
-        my $key    = $2;
-        my $value  = $3;
+    my $dict = Oden::Model::Dictionary->new({ file_name => $guild_id});
 
-        my $dict = Oden::Model::Dictionary->new({ file_name => $guild_id});
-        # TODO: 
-        #   - `add` and `set` pattern will not overwrite to dictionary.
-        #   - provide `overwrite` pattern instead of `add` and `set` pattern
-        #   - provide `delete` pattern.
-
-        if($method =~ m{(add|set)}){
-            my $value = $hear;
-            $value =~s{(add|set)\s$key\s*}{};
-            my $res = $dict->set($key => $value);
-            $talk .= 'registrated' if $res;
-            $talk .= 'fail'        unless $res;
-        }
-        elsif($method =~m{get|show}){
-            my $res = $dict->get($key);
-            $talk .= $res              if     $res;
-            $talk .= 'not registrated' unless $res;
-        }
-
+    if($hear =~ m{\Afile\z}){
+        $talk = $dict->file();
     }
+    elsif($hear =~ m{\A(?:rename|move)\s+(.*)\s+(.*)}){
+        my $before = $1;
+        my $after  = $2;
+        my $res = $dict->move($before, $after);
+        $talk  .= $res ?
+          sprintf("changed: %s => %s", $before, $after) :
+          sprintf("cant find %s", $before);
+    }
+    elsif($hear =~ m{\A(?:get|show)\s+(.+)}){
+        my $key    = $1;
+        my $res = $dict->get($key);
+        $talk .= $res              if     $res;
+        $talk .= 'not registrated' unless $res;
+    }
+    elsif($hear =~ m{(?:add|set)\s([^\s]+)\s+}){
+        my $key    = $1;
+        my $value  = $hear;
+        $value =~s{(add|set)\s+$key\s*}{};
+        my $res = $dict->set($key => $value);
+        $talk .= 'registrated'      if $res;
+        $talk .= 'the key already exists' unless $res;
+    }
+    elsif($hear =~ m{(?:overwrite)\s([^\s]+)\s+}){
+        my $key    = $1;
+        my $value  = $hear;
+        $value =~s{(overwrite)\s+$key\s*}{};
+        my $res = $dict->overwrite($key => $value);
+        $talk .= 'overwrote'       if     $res;
+        $talk .= 'not registrated' unless $res;
+    }
+    elsif($hear =~ m{(?:delete|remove)\s+(.+)}){
+        my $key    = $1; 
+        my $res = $dict->remove($key);
+        $talk .= 'removed'             if $res;
+        $talk .= 'not registrated' unless $res;
+    }
+
     return $talk;
 }
 
