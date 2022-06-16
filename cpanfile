@@ -3,11 +3,13 @@ requires 'AnyEvent::Discord';
 requires 'Config::Pit';
 
 # chat operations.
-requires 'JSON::XS';
-requires 'Text::CSV';
-requires 'URI::Escape';
 requires 'Furl';
+requires 'JSON::XS';
+requires 'Number::Format';
+requires 'Text::CSV';
+requires 'Text::CSV_XS';
 requires 'Time::Piece';
+requires 'URI::Escape';
 
 ## AnyEvent::Discord dependencys
 requires 'LWP::Protocol::https';
