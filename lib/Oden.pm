@@ -12,6 +12,7 @@ use Oden::Command::AYT;
 use Oden::Dispatcher;
 use Oden::Logger;
 use Oden::Preload;
+use Oden::Util::PlayList;
 
 =head1 NAME
 
@@ -76,6 +77,13 @@ sub discord {
             token => $self->{token},
         );
     };
+}
+
+sub playlist {
+    my $self = shift;
+    return $self->{_playlist} ||= do {
+        Oden::Util::PlayList->new();
+    }
 }
 
 sub logger {
