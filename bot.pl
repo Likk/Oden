@@ -7,6 +7,7 @@ use Config::Pit qw/pit_get/;
 use Encode;
 use JSON::XS;
 use Oden;
+use Oden::AnyEvent::Discord;
 
 =head1 NAME
 
@@ -30,6 +31,21 @@ my $bot = AnyEvent::Discord->new({
 
 my $oden    = Oden->new( token => $config->{token} );
 my $discord = $oden->discord();
+
+$bot->on('ready', sub {
+    $oden->logger->infof('Connected');
+    my ($client, $data) = @_;
+    my $playing = $oden->playlist->pick;
+    $client->update_status({
+        since      => time,
+        status     => 'online',
+        afk        => 'false',
+        activities => [{
+            name => $playing,
+            type => 0,
+        }],
+    });
+});
 
 $bot->on('message_create', sub {
     my ($client, $data) = @_;
