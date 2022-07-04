@@ -23,19 +23,6 @@ sub new {
     return $self;
 }
 
-sub _create_logger {
-    my $self = shift;
-
-    $self->{logger} ||= do {
-        File::RotateLogs->new(
-            logfile      => '/var/log/oden/bot/%Y/%m/%Y%m%d%H%M.log',
-            linkname     => '/var/log/oden/bot/log',
-            rotationtime => 3600,
-            maxage       => 86400, #1day
-        );
-    };
-}
-
 {
     no strict 'refs';
     for my $method (qw/critf warnf infof  debugf critff warnff infoff debugff croakf croakff/){
@@ -49,9 +36,41 @@ sub _create_logger {
     }
 }
 
+sub say {
+    my ($self, $message) = @_;
+    my $logger           = $self->{logger};
+
+    my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
+      localtime(time);
+    my $time    = sprintf(
+        "%04d-%02d-%02dT%02d:%02d:%02d",
+        $year + 1900,
+        $mon + 1, $mday, $hour, $min, $sec
+    );
+
+    my $full_message = sprintf("%s [SAY] %s",
+        $time,
+        $message,
+    );
+    $logger->print($full_message);
+}
+
+sub _create_logger {
+    my $self = shift;
+
+    $self->{logger} ||= do {
+        File::RotateLogs->new(
+            logfile      => '/var/log/oden/bot/%Y/%m/%Y%m%d%H%M.log',
+            linkname     => '/var/log/oden/bot/log',
+            rotationtime => 3600,
+            maxage       => 86400, #1day
+        );
+    };
+}
+
 $Log::Minimal::PRINT = sub {
     my ( $time, $type, $message, $trace) = @_;
-    return sprintf("%s [%s] %s at %s", $time, $type, $message, $trace);
+    return sprintf("%s [%s] %s at %s\n", $time, $type, $message, $trace);
 };
 
 1;

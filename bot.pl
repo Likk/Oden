@@ -6,6 +6,7 @@ use AnyEvent::Discord;
 use Config::Pit qw/pit_get/;
 use Encode;
 use JSON::XS;
+
 use Oden;
 use Oden::AnyEvent::Discord;
 
@@ -54,7 +55,12 @@ $bot->on('message_create', sub {
     # bot には反応しない
     return if $data->{author}->{bot};
 
-    $oden->logger->infof(JSON::XS::encode_json($data));
+    my $message = sprintf("%s@%s: %s",
+        $data->{author}->{username},
+        $client->channels->{$data->{channel_id}},
+        $data->{content},
+    );
+    $oden->logger->say(Encode::encode_utf8($message));
 
     my $res = $oden->talk(
         $content,
