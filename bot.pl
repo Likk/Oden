@@ -5,8 +5,8 @@ use utf8;
 use AnyEvent::Discord;
 use Config::Pit qw/pit_get/;
 use Encode;
-use Oden;
 use JSON::XS;
+use Oden;
 
 =head1 NAME
 
@@ -27,8 +27,9 @@ my $bot = AnyEvent::Discord->new({
     token   => $config->{token},
 });
 
-my $oden = Oden->new( token => $config->{token} );
-my $discord =$oden->discord();
+
+my $oden    = Oden->new( token => $config->{token} );
+my $discord = $oden->discord();
 
 $bot->on('message_create', sub {
     my ($client, $data) = @_;
@@ -37,7 +38,7 @@ $bot->on('message_create', sub {
     # bot には反応しない
     return if $data->{author}->{bot};
 
-    warn JSON::XS::encode_json($data);
+    $oden->logger->infof(JSON::XS::encode_json($data));
 
     my $res = $oden->talk(
         $content,

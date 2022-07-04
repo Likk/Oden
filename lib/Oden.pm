@@ -10,6 +10,7 @@ use URI::Escape;
 use Oden::API::Discord;
 use Oden::Command::AYT;
 use Oden::Dispatcher;
+use Oden::Logger;
 use Oden::Preload;
 
 =head1 NAME
@@ -70,10 +71,18 @@ sub talk {
 
 sub discord {
     my $self = shift;
-    return $self->{discord} ||= do {
+    return $self->{_discord} ||= do {
         Oden::API::Discord->new(
             token => $self->{token},
         );
     };
+}
+
+sub logger {
+    my $self = shift;
+    return $self->{_logger} ||= do {
+        Oden::Logger->new();
+    }
+
 }
 1;

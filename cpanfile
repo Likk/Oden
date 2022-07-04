@@ -11,6 +11,11 @@ requires 'Text::CSV_XS';
 requires 'Time::Piece';
 requires 'URI::Escape';
 
+## util
+requires 'File::RotateLogs';
+requires 'Log::Minimal';
+
+
 ## AnyEvent::Discord dependencys
 requires 'LWP::Protocol::https';
 requires 'Net::SSLeay';
