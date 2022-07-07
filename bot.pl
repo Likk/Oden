@@ -55,7 +55,7 @@ $bot->on('message_create', sub {
     # bot には反応しない
     return if $data->{author}->{bot};
 
-    my $message = sprintf("%s@%s: %s",
+    my $message = sprintf("%s@%s: %s\n",
         $data->{author}->{username},
         $client->channels->{$data->{channel_id}},
         $data->{content},
