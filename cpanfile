@@ -10,6 +10,7 @@ requires 'Text::CSV';
 requires 'Text::CSV_XS';
 requires 'Time::Piece';
 requires 'URI::Escape';
+requires 'Games::Dice';
 
 ## util
 requires 'File::RotateLogs';
