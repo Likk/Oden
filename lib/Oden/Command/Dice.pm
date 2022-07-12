@@ -33,7 +33,7 @@ sub run {
     # 
     unless($hear){
         my $dice = roll('1d6');
-        my $emoji_list = [qw/0 ⚀ ⚁ ⚂ ⚃ ⚄ ⚅/];
+        my $emoji_list = [qw/0 1⃣ 2⃣ 3⃣ 4⃣ 5⃣ 6⃣/];
         $talk = $emoji_list->[$dice];
         return sprintf("(っ'-')╮=͟͟͞͞ﾌﾞｫﾝ ⌒Y⌒Y⌒Y⌒.   .  . . .. .... %s @%s", $talk, $username);
     }
