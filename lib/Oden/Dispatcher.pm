@@ -11,6 +11,8 @@ our $DISPATCH = +{
     'fishing'    => 'Fishing',
     'market'     => 'MarketBoard',
     'dict'       => 'Dictionary',
+    'place'      => 'Place',
+    'Choice'     => 'Place',
 };
 
 sub dispatch {
