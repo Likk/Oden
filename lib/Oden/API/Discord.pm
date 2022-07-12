@@ -4,8 +4,8 @@ use warnings;
 
 use Furl;
 use HTTP::Request::Common;
-use JSON::XS qw/decode_json encode_json/;
-use Time::Piece;
+use JSON::XS    qw/decode_json encode_json/;
+use Time::HiRes qw/gettimeofday tv_interval/;
 
 =head1 NAME
 
@@ -31,7 +31,7 @@ sub new {
     die 'require token parameter.' unless $self->{token};
 
     $self->{base_url} ||= 'https://discordapp.com/api';
-    $self->{last_req} ||= time;
+    $self->{last_req} ||= $self->last_request_time;
     $self->{interval} ||= 1;
     return $self;
 }
@@ -97,6 +97,27 @@ sub show_message {
     );
 }
 
+sub send_message {
+    my ($self, $channel_id, $content) = @_;
+
+    my $endpoint = $self->{base_url} . sprintf("/channels/%s/messages", $channel_id);
+    my $req = POST(
+        $endpoint,
+        Content_Type    => 'application/json',
+        Authorization   => sprintf("Bot %s", $self->{token}),
+        User_Agent      => $self->_user_agent->agent,
+        Content         => encode_json(+{ content => $content }),
+    );
+
+    my $res = $self->_user_agent->request($req);
+    unless($res->is_success()){
+        warn $res->status_line;
+        return ;
+    }
+    return 1;
+
+}
+
 =head2
 
     request create message with attachement file,
@@ -145,6 +166,7 @@ sub _request {
         ],
         $params,
     );
+
     my $res = $self->_user_agent->request($req);
 
     my $data = {};
@@ -185,10 +207,21 @@ sub _user_agent {
 
 sub _sleep_interval {
   my $self = shift;
-  my $wait = $self->{interval} - (time - $self->{last_req});
-  sleep $wait if $wait > 0;
-  $self->{last_req} = time;
+
+  my $interval = tv_interval($self->last_request_time);
+  my $wait = $self->{interval} - $interval;
+  Time::HiRes::sleep($wait) if $wait > 0;
+  $self->{last_req} = [gettimeofday];
 }
+
+=item B<last_request_time>
+
+  request time at last request.
+
+=cut
+
+sub last_request_time { return shift->{last_req} ||= [gettimeofday] }
+
 
 =head1 SEE ALSO
 
