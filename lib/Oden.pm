@@ -60,7 +60,12 @@ sub talk {
         return $res;
     }
 
-    if($content =~ m{^/(\w+)?\s+(.*)}){
+    if($content =~ m{\A/(\w+)\z}){
+        my $command = $1;
+        my $package = Oden::Dispatcher->dispatch($command) or return;
+        $res = $package->run('', $guild_id, $username);
+    }
+    elsif($content =~ m{^/(\w+)?\s+(.*)}){
         my $command = $1;
         my $message = $content;
         $message =~ s{/$1\s}{};
