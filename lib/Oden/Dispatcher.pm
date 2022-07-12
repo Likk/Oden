@@ -13,6 +13,7 @@ our $DISPATCH = +{
     'dict'       => 'Dictionary',
     'place'      => 'Place',
     'Choice'     => 'Place',
+    'dice'       => 'Dice',
 };
 
 sub dispatch {
