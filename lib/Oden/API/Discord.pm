@@ -6,6 +6,7 @@ use Furl;
 use HTTP::Request::Common;
 use JSON::XS    qw/decode_json encode_json/;
 use Time::HiRes qw/gettimeofday tv_interval/;
+use URI;
 
 =head1 NAME
 
@@ -48,9 +49,10 @@ sub endpoint_config {
     my ($self) = @_;
     return $self->{endpoint_list} ||= do {
             +{
-                show_message => $self->{base_url} . "/channels/%s/messages/%s",
-                show_channel => $self->{base_url} . "/channels/%s",
-                show_user    => $self->{base_url} . "/users/%s",
+                show_message       => $self->{base_url} . "/channels/%s/messages/%s",
+                show_channel       => $self->{base_url} . "/channels/%s",
+                show_user          => $self->{base_url} . "/users/%s",
+                list_guild_members => $self->{base_url} . "/guilds/%s/members",
             };
     };
 }
@@ -83,6 +85,20 @@ sub show_channel {
     );
 }
 
+=head2 list_guild_members
+
+  show guild members list.
+
+=cut
+
+sub list_guild_members {
+    my ($self, $guild_id, $option) = @_;
+    $option->{limit} ||= 50;
+    return $self->_request(
+        sprintf($self->endpoint_config->{list_guild_members}, $guild_id) => $option
+    );
+}
+
 =head2 show_message
 
   show message detail
@@ -96,6 +112,12 @@ sub show_message {
         sprintf($self->endpoint_config->{show_message}, $channel_id, $message_id) => +{}
     );
 }
+
+=head2
+
+  request create message.
+
+=cut
 
 sub send_message {
     my ($self, $channel_id, $content) = @_;
@@ -159,12 +181,13 @@ sub _request {
     my ($self, $endpoint, $params) = @_;
 
     $self->_sleep_interval;
-    my $req = HTTP::Request->new('GET' => $endpoint,
+    my $url = URI->new($endpoint);
+    $url->query_form(%$params);
+    my $req = HTTP::Request->new('GET' => $url->as_string,
         [
             Authorization => sprintf("Bot %s", $self->{token}),
             User_Agent    => $self->_user_agent->agent,
         ],
-        $params,
     );
 
     my $res = $self->_user_agent->request($req);
