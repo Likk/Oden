@@ -1,5 +1,6 @@
 dict/
 local/
+bin/
 cpanfile.snapshot
 .*
 !.gitignore

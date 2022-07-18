@@ -13,6 +13,7 @@ requires 'URI::Escape';
 requires 'Games::Dice';
 
 ## util
+requires 'Array::Diff';
 requires 'File::RotateLogs';
 requires 'Log::Minimal';
 
