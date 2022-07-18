@@ -5,7 +5,6 @@ use utf8;
 use AnyEvent::Discord;
 use Config::Pit qw/pit_get/;
 use Encode;
-use JSON::XS;
 
 use Oden;
 use Oden::AnyEvent::Discord;
