@@ -31,7 +31,7 @@ sub run {
 
     return unless $hear;
     my $talk;
-    if($hear =~ m{(.*)?\s(.*)}){
+    if($hear =~ m{(.*?)?\s(.*)}){
         my $world_or_dc = $1;
         my $item_name   = $2;
 
