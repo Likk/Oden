@@ -46,23 +46,52 @@ sub run {
 
     # TRPG lile
     ## 通常の使い方はこっち
-    if($hear =~ m{^(?:\d+)?d\d+$}){
-        my @rolls = roll_array($hear);
+    if($hear =~ m{^(\d+)?[Dd](\d+)?$}){
+        my $unit  = $1 // 1; # default unit
+        my $sided = $2 // 6; # default sided
+
+        ## 異常系
+        ### 投げて
+        return sprintf("error! @%s", $username) if $unit  == 0;
+
+        ### 何個投げても無駄
+        return sprintf("0 @%s",      $username) if $sided == 0;
+
+        ## 正常系
+        my $roll_string = sprintf("%sD%s", $unit, $sided);
+
+        ### one dice.
+        return sprintf("%s @%s", roll($roll_string), $username) if $unit == 1;
+
+        ### many dices.
+        my @rolls = roll_array($roll_string);
         my $total = sum(@rolls);
-        return sprintf("%s @%s", $total, $username) if scalar @rolls == 1;
-        return sprintf("total:%s (%s) @%s",
-            $total,
+        return sprintf("%s (%s) @%s",
+            (
+                $total == $unit * $sided ? 'CRITICAL!!' :
+                $total == $unit          ? '"FUMBLE!!'  :
+                                           'total: '. $total,
+            ),
             join(',', @rolls),
             $username,
         );
     }
-    elsif($hear =~ m{^(?:\d+)?dF$}){
+    ## FateDice (+0-)だけのやつ
+    elsif($hear =~ m{^(\d+)?[Dd]F$}){
+        my $unit  = $1 // 1; # default unit
+
+        ## 異常系
+        ### 投げて
+        return sprintf("error! @%s", $username) if $unit  == 0;
+
+        ## 正常系
+        my $roll_string = sprintf("%sDF", $unit);
         my @rolls = map {
             $_ == -1 ? '-' :
                   0  ? '0' :
                   1  ? '+' :
                   '/'; #ここにはこないはず
-        } roll_array($hear);
+        } roll_array($roll_string);
 
         return sprintf("%s %s",
             join(',', @rolls),
