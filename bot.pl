@@ -5,7 +5,6 @@ use utf8;
 use AnyEvent::Discord;
 use Config::Pit qw/pit_get/;
 use Encode;
-
 use Oden;
 use Oden::AnyEvent::Discord;
 
@@ -54,9 +53,12 @@ $bot->on('message_create', sub {
     # bot には反応しない
     return if $data->{author}->{bot};
 
+    #TODO: thread
+    my $channel_name = $client->channels->{$data->{channel_id}} || 'thread';
+
     my $message = sprintf("%s@%s: %s\n",
         $data->{author}->{username},
-        $client->channels->{$data->{channel_id}},
+        $channel_name,
         $data->{content},
     );
     $oden->logger->say(Encode::encode_utf8($message));
@@ -129,6 +131,7 @@ $bot->on('message_update', sub {
                       : $config->{information_channel_id};
 
         $client->send($post_channel_id, $res) if $res;
+        $discord->join_thread($data->{id});
     }
 });
 

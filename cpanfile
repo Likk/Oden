@@ -15,8 +15,9 @@ requires 'Games::Dice';
 ## util
 requires 'Array::Diff';
 requires 'File::RotateLogs';
+requires 'HTTP::Date';
 requires 'Log::Minimal';
-
+requires 'WebService::Discord::Webhook';
 
 ## AnyEvent::Discord dependencys
 requires 'LWP::Protocol::https';

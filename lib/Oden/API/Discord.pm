@@ -169,6 +169,40 @@ sub send_attached_file {
     return 1;
 }
 
+
+sub join_thread {
+    my ($self, $channel_id, ) = @_;
+
+    my $endpoint = sprintf("%s/channels/%s/thread-members/%s",
+        $self->{base_url},
+        $channel_id,
+        '@me',
+    );
+
+    $self->_sleep_interval;
+    my $url = URI->new($endpoint);
+    $url->query_form();
+    my $req = HTTP::Request->new('PUT' => $endpoint,
+        [
+            Authorization => sprintf("Bot %s", $self->{token}),
+            User_Agent    => $self->_user_agent->agent,
+        ],
+    );
+
+    my $res = $self->_user_agent->request($req);
+
+    my $data = {};
+
+    unless($res->is_success()){
+        warn $res->status_line;
+        return ;
+    }
+
+    #returns no contents 204 responce
+    return 1;
+}
+
+
 =head1 PRIVATE METHODS
 
 =head2 _request
