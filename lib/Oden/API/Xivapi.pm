@@ -49,14 +49,14 @@ sub _request {
 
     my $data;
     unless($res->is_success()){
-        warn $res->status_line;
+        die $res->status_line;
     }
     eval {
         $data = decode_json($res->decoded_content());
     };
     if($@){
         my $e = $@;
-        warn $e;
+        die $e;
     }
     return $data;
 }
