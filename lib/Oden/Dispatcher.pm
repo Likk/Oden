@@ -12,7 +12,7 @@ our $DISPATCH = +{
     'market'     => 'MarketBoard',
     'dict'       => 'Dictionary',
     'place'      => 'Place',
-    'Choice'     => 'Place',
+    'choice'     => 'Place',
     'dice'       => 'Dice',
 };
 
