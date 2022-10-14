@@ -14,8 +14,10 @@ requires 'Games::Dice';
 
 ## util
 requires 'Array::Diff';
+requires 'Hash::Diff';
 requires 'File::RotateLogs';
 requires 'HTTP::Date';
+requires 'HTTP::Parser::XS';
 requires 'Log::Minimal';
 requires 'WebService::Discord::Webhook';
 
