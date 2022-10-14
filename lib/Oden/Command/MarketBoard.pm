@@ -31,10 +31,10 @@ sub run {
 
     return unless $hear;
     my $talk;
-    if($hear =~ m{(.*?)?\s(.*)}){
-        my $world_or_dc = $1;
-        my $item_name   = $2;
-
+    if($hear =~ m{(?<target>.+?)\s(?<hq_flag>HQ\s)?(?<item_name>.+)}){
+        my $world_or_dc = $+{target};
+        my $hq_flag     = $+{hq_flag} || '';
+        my $item_name   = $+{item_name};
         my $item = Oden::Model::Item->lookup_item_by_name($item_name);
         return $talk unless $item;
 
@@ -42,6 +42,7 @@ sub run {
 
         my $res = Oden::API::Universalis->current_data(+{
             world_or_dc => $world_or_dc,
+            $hq_flag ? ( hq =>  1 ): (),
             item_ids    => [ $item->{id} ],
         });
 

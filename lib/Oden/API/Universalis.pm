@@ -139,10 +139,11 @@ sub current_data {
 sub _request {
     my ($class, $endpoint, $params) = @_;
 
-    my $req = HTTP::Request->new('GET' => $endpoint,
-        [],
-        $params,
-    );
+
+    my $url = URI->new($endpoint);
+    $url->query_form(%$params);
+
+    my $req = HTTP::Request->new('GET' => $url->as_string);
     my $res = $class->_user_agent->request($req);
 
     my $data;
