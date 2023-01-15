@@ -46,9 +46,14 @@ sub run {
             item_ids    => [ $item->{id} ],
         });
 
-        $talk .= sprintf("last update: %s\n",   $res->{lastUploadTime});
-        for my $row (@{$res->{entry}}){
-            $talk .= $class->_format($row, $world_or_dc);
+        if($res){
+            $talk .= sprintf("last update: %s\n",   $res->{lastUploadTime});
+            for my $row (@{$res->{entry}}){
+                $talk .= $class->_format($row, $world_or_dc);
+            }
+        }
+        else {
+            $talk .= "Oops! Cannot read response. Retry at a later time";
         }
     }
     return $talk;

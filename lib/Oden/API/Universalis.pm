@@ -92,6 +92,7 @@ sub current_data {
        $stats_within ? ( statsWithin => $entries_within ) : (),
     });
 
+    return unless $res;
     my @entry = sort {
         $a->{pricePerUnit} <=> $b->{pricePerUnit},
     }
@@ -148,7 +149,9 @@ sub _request {
 
     my $data;
     unless($res->is_success()){
-        warn $res->status_line;
+        use YAML;
+        warn YAML::Dump $res;
+        return;
     }
     eval {
         $data = decode_json($res->decoded_content());
@@ -156,6 +159,7 @@ sub _request {
     if($@){
         my $e = $@;
         warn $e;
+        return;
     }
     return $data;
 }
