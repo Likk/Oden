@@ -69,7 +69,7 @@ sub run {
         return sprintf("%s (%s) @%s",
             (
                 $total == $unit * $sided ? 'CRITICAL!!' :
-                $total == $unit          ? '"FUMBLE!!'  :
+                $total == $unit          ? 'FUMBLE!!'  :
                                            'total: '. $total,
             ),
             join(',', @rolls),
