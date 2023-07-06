@@ -59,9 +59,10 @@ returns market board from universalis
 ### dict delete ${key}
 
 # choice [list]
-returns rundom choice from list
+returns random choice from list
 
 # dice
 roll dice. default 1d6.
 The dice string uses the following format: [0-9]+d[F0-9]+
 examples: 1d20, 2d10, 1dF
+see also: L<https://metacpan.org/dist/Games-Dice>
