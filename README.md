@@ -29,3 +29,39 @@ vim ./.pit/default.yaml
 
 # LUNCH YOUR BOT
 ./env.sh perl bot.pl
+
+# Bot Slash Command List
+- ayt
+- itemsearch
+- fishing
+- market
+- dict
+- place
+- dice
+
+## ayt
+ping. like AYT command on telnet. its means 'are you there?'.
+
+## itemsearch ${item_name}
+returns lodestone url. 
+
+## fishing ${item_name}
+retruns teamcraft url.
+
+## market ${server_or_DC} ${item_name}
+returns market board from universalis
+
+## dict
+### dict add ${key} ${word}
+### dict overwrite ${key} ${word}
+### dict get ${key}
+### dict move ${old_key} ${new_key}
+### dict delete ${key}
+
+#/choice [list]
+returns rundom choice from list
+
+#dice
+roll dice. default 1d6.
+The dice string uses the following format: [0-9]+d[F0-9]+
+examples: 1d20, 2d10, 1dF
