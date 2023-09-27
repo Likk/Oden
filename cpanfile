@@ -6,6 +6,7 @@ requires 'Config::Pit';
 requires 'Furl';
 requires 'JSON::XS';
 requires 'Number::Format';
+requires 'String::Random';
 requires 'Text::CSV';
 requires 'Text::CSV_XS';
 requires 'Time::Piece';

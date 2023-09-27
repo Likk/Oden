@@ -4,6 +4,7 @@ set -e
 export EDITOR=vim;
 export PATH="local/bin:$PATH"
 export BASE_DIR=$(cd $(dirname $0); pwd)
+export PLENV_VERSION=`cat $BASE_DIR/.perl-version`
 
 export PERL5LIB="$BASE_DIR/local/lib/perl5:$BASE_DIR/lib"
 export LANG="C";
