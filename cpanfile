@@ -17,9 +17,13 @@ requires 'Games::Dice';
 requires 'Array::Diff';
 requires 'Hash::Diff';
 requires 'File::RotateLogs';
+requires 'Function::Parameters';
+requires 'Function::Return';
+requires 'Types::Standard';
 requires 'HTTP::Date';
 requires 'HTTP::Parser::XS';
 requires 'Log::Minimal';
+requires 'Web::Query';
 requires 'WebService::Discord::Webhook';
 
 ## AnyEvent::Discord dependencys
