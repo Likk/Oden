@@ -14,6 +14,7 @@ our $DISPATCH = +{
     'place'      => 'Place',
     'choice'     => 'Place',
     'dice'       => 'Dice',
+    'group'      => 'Group',
 };
 
 sub dispatch {

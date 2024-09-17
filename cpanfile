@@ -4,14 +4,16 @@ requires 'Config::Pit';
 
 # chat operations.
 requires 'Furl';
+requires 'Games::Dice';
 requires 'JSON::XS';
+requires 'List::Util';
 requires 'Number::Format';
 requires 'String::Random';
 requires 'Text::CSV';
 requires 'Text::CSV_XS';
+requires 'Text::Trim';
 requires 'Time::Piece';
 requires 'URI::Escape';
-requires 'Games::Dice';
 
 ## util
 requires 'Array::Diff';
