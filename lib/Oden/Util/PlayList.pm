@@ -57,25 +57,26 @@ sub playlist {
         アク抜き
         出汁
         煮込み
+        寝かせ
     /];
     state $ingredients = [qw/
-        冷却
-        卵
-        大根
+        厚揚げ
+        がんもどき
+        牛すじ
+        昆布
+        ごぼ天
         蒟蒻
-        はんぺん
-        卵
-        餅巾着
         さつま揚げ
+        たこ
         しらたき
-        つくね
+        大根
+        卵
         竹輪
         ちくわぶ
-        がんもどき
-        昆布
-        厚揚げ
-        ごぼう天
-        牛すじ
+        つくね
+        つみれ
+        はんぺん
+        餅巾着
     /];
 
     my $playlist = (ref $ext_play_list eq 'ARRAY' && scalar @$ext_play_list) ? $ext_play_list: [@$process, @$ingredients];
