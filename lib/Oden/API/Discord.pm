@@ -133,7 +133,8 @@ sub send_message {
 
     my $res = $self->_user_agent->request($req);
     unless($res->is_success()){
-        warn $res->status_line;
+        warn $res->status;
+        warn $res->message;
         return ;
     }
     return 1;
@@ -168,7 +169,6 @@ sub send_attached_file {
     }
     return 1;
 }
-
 
 sub join_thread {
     my ($self, $channel_id, ) = @_;
@@ -228,7 +228,8 @@ sub _request {
 
     my $data = {};
     unless($res->is_success()){
-        warn $res->status_line;
+        warn $res->status;
+        warn $res->message;
         return ;
     }
     eval {

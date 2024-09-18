@@ -149,8 +149,8 @@ sub _request {
 
     my $data;
     unless($res->is_success()){
-        use YAML;
-        warn YAML::Dump $res;
+        warn $res->status;
+        warn $res->message;
         return;
     }
     eval {
