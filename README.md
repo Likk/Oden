@@ -13,8 +13,8 @@ $ cd ./Oden
 $ anyenv install plenv
 $ cat .perl-version | xargs plenv install
 $ ./env.sh plenv install-cpanm
-$ ./env.sh cpanm Carton
-$ ./env.sh carton install
+$ ./env.sh cpanm App::cpm
+$ ./env.sh cpm install
 ```
 
 ## edit your bot configure
