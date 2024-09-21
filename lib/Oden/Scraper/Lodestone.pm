@@ -1,13 +1,13 @@
 package Oden::Scraper::Lodestone;
-use 5.38.0;
+use 5.40.0;
 use base 'Class::Accessor::Fast';
-
-use Furl;
-use Web::Query;
 
 use Function::Parameters;
 use Function::Return;
+use Furl;
+use Text::Trim;
 use Types::Standard -types;
+use Web::Query;
 
 =head1 NAME
 
@@ -120,10 +120,38 @@ method endpoint_config(Maybe[HashRef] $endopoint_config = undef ): Return(HashRe
     $self->{endpoint_hash} = $endopoint_config if defined $endopoint_config;
     return $self->{endpoint_hash} || do {
         +{
-            top                  => '/',
+            top                  => '%s/',
             crossworld_linkshell => "%s/crossworld_linkshell/%s/",
         };
     };
+}
+
+=head2 brand_section
+
+  show brand section. // for test method.
+
+=cut
+
+method brand_section(): Return(HashRef){
+    my $url = sprintf($self->endpoint_config->{top}, $self->base_url);
+    $self->_get($url);
+    my $content = $self->last_content;
+    my $brand   = +{};
+
+    my $wq = Web::Query->new_from_html($content);
+    $wq->find(\q{//div[@class='brand']/div[@class="brand__section"]/div[@class="brand__logo"]})->each(sub {
+        my ($i, $elem) = @_;
+
+        my $anchor = $elem->find(q{a});
+        my $image  = $anchor->find(q{img});
+        $brand = +{
+            url   => Text::Trim::trim($anchor->attr('href')), # remove space and newline
+            image => $image->attr('src'),
+            alt   => $image->attr('alt'),
+        };
+    });
+
+    return $brand;
 }
 
 =head2 crossworld_linkshell
