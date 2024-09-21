@@ -25,21 +25,21 @@ use Types::Standard -types;
 
 =over
 
-=item B<ua>
+=item B<user_agent>
 
   Furl object.
 
 =cut
 
-method ua(Maybe[Str] $agent = undef): Return(InstanceOf['Furl']){
-    my $ua = $self->{ua} || do {
-        $self->{ua} = Furl->new(
+method user_agent(Maybe[Str] $agent = undef): Return(InstanceOf['Furl']){
+    my $user_agent = $self->{user_agent} || do {
+        $self->{user_agent} = Furl->new(
             agent      => 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.89 Safari/537.36',
             timeout    => 60,
         );
     };
-    $ua->agent($agent) if $agent;
-    return $ua;
+    $user_agent->agent($agent) if $agent;
+    return $user_agent;
 }
 
 =item B<interval>
@@ -77,16 +77,17 @@ method last_content(Maybe[Str] $last_content = undef): Return(Str){
 
 =back
 
-=head1 METHDOS
+=head1 METHODS
 
-=head1 lang
+=head1 language
 
-  set lang at lodestone.
+  set language for lodestone.
+  choose from jp, na, eu, fr, de.
   default jp.
 
 =cut
 
-method lang(Maybe[Str] $lang = 'jp'): Return(Str){
+method language(Maybe[Str] $lang = 'jp'): Return(Str){
     $self->{lang} = $lang if defined $lang;
 }
 
@@ -99,7 +100,7 @@ method lang(Maybe[Str] $lang = 'jp'): Return(Str){
 method base_url(Maybe[Str] $base_url = undef): Return(Str){
     $self->{base_url} = $base_url if defined $base_url;
     return $self->{base_url} || do {
-        my $lang = $self->lang;
+        my $lang = $self->language;
         my $is_supported_lang = scalar grep { $_ eq $lang } qw/jp na eu fr de/;
         unless($is_supported_lang){
            $self->lang('jp');
@@ -109,15 +110,15 @@ method base_url(Maybe[Str] $base_url = undef): Return(Str){
     };
 }
 
-=head2 conf
+=head2 endpoint_config
 
   url path config
 
 =cut
 
-method conf(Maybe[HashRef] $conf = undef ): Return(HashRef) {
-    $self->{conf} = $conf if defined $conf;
-    return $self->{conf} || do {
+method endpoint_config(Maybe[HashRef] $endopoint_config = undef ): Return(HashRef) {
+    $self->{endpoint_hash} = $endopoint_config if defined $endopoint_config;
+    return $self->{endpoint_hash} || do {
         +{
             top                  => '/',
             crossworld_linkshell => "%s/crossworld_linkshell/%s/",
@@ -133,7 +134,7 @@ method conf(Maybe[HashRef] $conf = undef ): Return(HashRef) {
 =cut
 
 method crossworld_linkshell(Str $cwls_id): Return(ArrayRef[HashRef]){
-    my $url = sprintf($self->conf->{crossworld_linkshell}, $self->base_url, $cwls_id);
+    my $url = sprintf($self->endpoint_config->{crossworld_linkshell}, $self->base_url, $cwls_id);
 
     $self->_get($url);
 
@@ -219,7 +220,7 @@ sub _set_last_request_time { shift->{last_req} = time }
 sub _get {
     my ($self, $url, $header, $content) = @_;
     $self->_sleep_interval;
-    my $response = $self->ua->get($url);
+    my $response = $self->user_agent->get($url);
     if(!$response->is_success){
         die sprintf("%s => %s", $response->status_line, $url);
     }

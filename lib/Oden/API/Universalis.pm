@@ -25,7 +25,7 @@ use Time::Piece;
 
 =over
 
-=item B<itemIds>
+=item B<item_ids>
 
   required. a list of number(Oden::Model::Item#id)
 
@@ -45,9 +45,9 @@ use Time::Piece;
 
   string (query) If the result should not have Gil sales tax (GST) factored in. GST is applied to all consumer purchases in-game, and is separate from the retainer city tax that impacts what sellers receive. By default, GST is factored in. Set this parameter to true or 1 to prevent this.
 
-=item B<hq>
+=item B<is_high_quality>
 
-  string (query) Filter for HQ listings and entries. By default, both HQ and NQ listings and entries will be returned.
+  string (query) Filter for "high quality" listings and entries. By default, both high quality and not high quality listings and entries will be returned.
 
 =item B<stats_within>
 
@@ -74,7 +74,7 @@ sub current_data {
     my $listings        = $params->{listings};
     my $entries         = $params->{entries};
     my $no_gst          = $params->{no_gst};
-    my $hq              = $params->{hq};
+    my $is_high_quality = $params->{is_high_quality};
     my $stats_within    = $params->{stats_within};
     my $entries_within  = $params->{entries_within};
 
@@ -84,12 +84,12 @@ sub current_data {
     );
 
     my $res = $class->_request($endpoint => +{
-       $listings     ? ( listings    => $listings       ) : (),
-       $entries      ? ( entries     => $entries        ) : (),
-       $no_gst       ? ( noGst       => $no_gst         ) : (),
-       $hq           ? ( hq          => $hq             ) : (),
-       $stats_within ? ( statsWithin => $stats_within   ) : (),
-       $stats_within ? ( statsWithin => $entries_within ) : (),
+       $listings        ? ( listings    => $listings        ) : (),
+       $entries         ? ( entries     => $entries         ) : (),
+       $no_gst          ? ( noGst       => $no_gst          ) : (),
+       $is_high_quality ? ( hq          => $is_high_quality ) : (),
+       $stats_within    ? ( statsWithin => $stats_within    ) : (),
+       $stats_within    ? ( statsWithin => $entries_within  ) : (),
     });
 
     return unless $res;
@@ -123,11 +123,9 @@ sub current_data {
         #'currentAveragePriceHQ'
         #'currentAveragePriceNQ'
         #'hqSaleVelocity'
-        #'lastUploadTime'
     };
     return $data;
 }
-
 
 =head1 PRIVATE METHODS
 

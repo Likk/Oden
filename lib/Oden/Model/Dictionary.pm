@@ -16,7 +16,7 @@ Oden::Model::Dictionary
 
   Oden::Model::Dictionary is key-word dictionary.
 
-=head1 SINOPSYS
+=head1 SYNOPSIS
 
   my $dictionary =  Oden::Model::Dictionary->new({ file_name=> xxxx });
   $dictionary->set( foo => 'bar');
@@ -45,7 +45,7 @@ sub new {
     return $self;
 }
 
-=head2 METHODS
+=head1 METHODS
 
 =head2 file
 
@@ -171,7 +171,7 @@ sub move {
 }
 
 
-=head1 PRIVATE METHDOS
+=head1 PRIVATE METHODS
 
 =head2 _dictionary
 
