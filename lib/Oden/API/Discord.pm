@@ -257,7 +257,7 @@ sub _user_agent {
     return $furl;
 }
 
-=item B<_sleep_interval>
+=head2 B<_sleep_interval>
 
   keep the Request interval.
 
@@ -272,14 +272,13 @@ sub _sleep_interval {
   $self->{last_req} = [gettimeofday];
 }
 
-=item B<last_request_time>
+=head2 B<last_request_time>
 
   request time at last request.
 
 =cut
 
 sub last_request_time { return shift->{last_req} ||= [gettimeofday] }
-
 
 =head1 SEE ALSO
 

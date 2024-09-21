@@ -75,6 +75,8 @@ method last_content(Maybe[Str] $last_content = undef): Return(Str){
     return $self->{last_content} // do { $self->{last_content} = ''};
 }
 
+=back
+
 =head1 METHDOS
 
 =head1 lang
@@ -185,7 +187,7 @@ sub _scrape_crossworld_linkshell {
 
 =head2 HTTP REQUEST METHODS
 
-=cut
+=over
 
 =item B<_sleep_interval>
 
