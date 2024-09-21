@@ -1,7 +1,8 @@
 package Oden::AnyEvent::Discord;
+use strict;
+use warnings;
 use Moops;
 
-no warnings 'redefine';
 class AnyEvent::Discord 0.7 {
     use v5.14;
     use AnyEvent::Discord::Payload;

@@ -1,4 +1,4 @@
-package Oden;
+package Oden::Preload;
 use strict;
 use warnings;
 use utf8;
