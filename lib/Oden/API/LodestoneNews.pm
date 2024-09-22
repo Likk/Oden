@@ -29,7 +29,7 @@ sub list {
     $category ||= 'all';
     $locale   ||= 'na';
     $limit    ||= 20;
-    my $res = $class->_request(sprintf("%s/news/%s?locale=%s&limit=%s",
+    return $class->_request(sprintf("%s/news/%s?locale=%s&limit=%s",
         $BASE_URL,
         $category,
         $locale,
