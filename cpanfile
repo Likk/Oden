@@ -40,10 +40,11 @@ on 'develop' => sub {
 on 'test' => sub {
     requires 'App::ForkProve';
     # ./t layer
-    requires 'Test::More';
+    requires 'Test::Exception';
     requires 'Test::Spec';
 
     # ./xt layer
+    requires 'Test::More';
     requires 'Test::Perl::Critic';
     requires 'Test::Pod';
     requires 'Test::Spelling';
