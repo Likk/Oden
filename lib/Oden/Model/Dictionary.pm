@@ -1,16 +1,19 @@
 package Oden::Model::Dictionary;
-use strict;
-use warnings;
+use 5.40.0;
 use utf8;
 use autodie;
+
 use Encode;
 use File::Temp qw/tempfile/;
+use Function::Parameters;
+use Function::Return;
 use Storable   qw/lock_nstore lock_retrieve/;
 use Text::CSV_XS;
+use Types::Standard -types;
 
 =head1 NAME
 
-Oden::Model::Dictionary
+  Oden::Model::Dictionary
 
 =head1 DESCRIPTION
 
@@ -30,33 +33,39 @@ Oden::Model::Dictionary
 
 =cut
 
-sub new {
-    my ($class, $opt) = @_;
-
-    my $dic_dir = $ENV{DICT_DIR} || './dict';
-
-    $opt            ||=+{};
-    $opt->{dic_dir} ||= $dic_dir;
-
+method new($class: HashRef $opt) :Return(InstanceOf['Oden::Model::Dictionary']) {
     die 'require file_name option. Oden::Model::Dictionary->new({ file_name => xxxx })'
       unless $opt->{file_name};
 
     my $self = bless $opt, $class;
+    $self->dictionaly_path($ENV{DICT_DIR} || './dict');
     return $self;
+}
+
+=head1 Accessor
+
+=over
+
+=item B<dictionaly_directory_path>
+
+  dictionaly data file path.
+
+=cut
+
+method dictionaly_path(Str $path) :Return(Str){
+    return $self->{dic_dir} ||= $path;
 }
 
 =head1 METHODS
 
-=head2 file
+=head2 create_stored_file
 
-  create tsv file from dictionary.
+  create (n)stored file from dictionary.
 
 =cut
 
-sub file {
-    my ($self) = @_;
-
-    my ($fh, $filename) = tempfile(SUFFIX => '.tsv', UNLINK => 0 );
+method create_stored_file() :Return(Str){
+    my ($fh, $filename) = tempfile(SUFFIX => '.tsv', UNLINK => 1);
     my $tsv        = Text::CSV_XS->new(+{
         binary   => 1,
         sep_char => "\t",
@@ -64,10 +73,6 @@ sub file {
     });
 
     my $dictionary = $self->_dictionary;
-
-
-    $tsv->combine(['key','value']);
-    $fh->print();
     for my $key (sort keys %$dictionary) {
         my $value = $dictionary->{$key};
         chomp $value;
@@ -75,45 +80,41 @@ sub file {
         $tsv->combine(@$row) or die $tsv->error_diag();
         $fh->print(Encode::encode_utf8($tsv->string()));
     }
+    $fh->close;
 
-    return +{
-        fh       => $fh,
-        filename => $filename,
-    };
+    return $filename;
 }
 
-=head2  set
+=head2 set
 
   set key-value data on dictionary.
 
 =cut
 
-sub set {
-    my ($self, $key, $value) = @_;
-    return unless $key;
-    return unless $value;
+method set(Str $key, Str $value) :Return(Bool){
+    return 0 unless $key;
+    return 0 unless $value;
 
     my $dictionary = $self->_dictionary;
-    return if delete $dictionary->{$key};
+    return 0 if exists $dictionary->{$key};
 
     $dictionary->{$key} = $value;
     lock_nstore($dictionary, $self->_file());
     return 1;
 }
 
-=head2  overwrite
+=head2 overwrite
 
   overwrite key-value data on dictionary.
 
 =cut
 
-sub overwrite {
-    my ($self, $key, $value) = @_;
-    return unless $key;
-    return unless $value;
+method overwrite(Str $key, Str $value) :Return(Bool){
+    return 0 unless $key;
+    return 0 unless $value;
 
     my $dictionary = $self->_dictionary;
-    return unless delete $dictionary->{$key};
+    return 0 unless delete $dictionary->{$key};
 
     $dictionary->{$key} = $value;
     lock_nstore($dictionary, $self->_file());
@@ -126,13 +127,12 @@ sub overwrite {
 
 =cut
 
-sub remove {
-    my ($self, $key) = @_;
-    return unless $key;
+method remove(Str $key) :Return(Bool){
+    return 0 unless $key;
 
     my $dictionary = $self->_dictionary;
     my $value = delete $dictionary->{$key};
-    return unless $value;
+    return 0 unless $value;
 
     lock_nstore($dictionary, $self->_file());
     return 1;
@@ -144,11 +144,11 @@ sub remove {
 
 =cut
 
-sub get {
-    my ($self, $key) = @_;
-    return unless $key;
+method get(Str $key) :Return(Maybe[Str]){
+    return undef unless $key;
 
     my $dictionary = $self->_dictionary;
+    return undef unless exists $dictionary->{$key};
     return $dictionary->{$key};
 }
 
@@ -158,12 +158,13 @@ sub get {
 
 =cut
 
-sub move {
-    my ($self, $before, $after) = @_;
+method move(Str $before, Str $after) :Return(Bool){
+    return 0 unless $before;
+    return 0 unless $after;
 
     my $dictionary = $self->_dictionary;
     my $value = delete $dictionary->{$before};
-    return unless $value;
+    return 0 unless $value;
 
     $dictionary->{$after} = $value;
     lock_nstore($dictionary, $self->_file());

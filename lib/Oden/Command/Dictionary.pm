@@ -35,7 +35,10 @@ sub run {
     my $dict = Oden::Model::Dictionary->new({ file_name => $guild_id});
 
     if($hear =~ m{\Afile\z}){
-        $talk = $dict->file();
+        my $filename = $dict->file()
+        $talk = {
+            filename => $filename
+        };
     }
     elsif($hear =~ m{\A(?:rename|move)\s+(.*)\s+(.*)}){
         my $before = $1;
