@@ -171,7 +171,6 @@ method move(Str $before, Str $after) :Return(Bool){
     return 1;
 }
 
-
 =head1 PRIVATE METHODS
 
 =head2 _dictionary
@@ -222,6 +221,3 @@ sub _file {
   L<Storable>
 
 =cut
-
-
-1;
