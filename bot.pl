@@ -74,9 +74,9 @@ $bot->on('message_create', sub {
     # Oden からのレスポンスによって返答の挙動を変えたい
     my $res_type = ref $res;
 
-    if($res_type eq 'HASH' && $res->{filename}){ #今のところファイル添付しかないけど、ファイル型にした方良さそう # Oden::Response::File ... ?
+    # レスポンスが Oden::Response::Dictionary の場合はファイルを添付して送信
+    if($res->isa('Oden::Response::Dictionary')){
         my $filename = $res->{filename};
-        undef $res; # $fh 開放してあげないと、ロックかかってるっぽくて添付できない
         $discord->send_attached_file($data->{channel_id}, $filename, 'dictionary.tsv');
 
         # 基本的に不要なはず

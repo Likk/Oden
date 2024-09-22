@@ -2,8 +2,9 @@ package Oden::Command::Dictionary;
 use strict;
 use warnings;
 
-use Oden::Model::Dictionary;
 use Oden::API::Universalis;
+use Oden::Model::Dictionary;
+use Oden::Response::Dictionary;
 
 =head1 NAME
 
@@ -35,10 +36,11 @@ sub run {
     my $dict = Oden::Model::Dictionary->new({ file_name => $guild_id});
 
     if($hear =~ m{\Afile\z}){
-        my $filename = $dict->file()
-        $talk = {
-            filename => $filename
-        };
+        my $filename = $dict->create_stored_file();
+        $talk = Oden::Response::Dictionary->new(+{
+            filename    => $filename,
+            auto_remove => 1
+        });
     }
     elsif($hear =~ m{\A(?:rename|move)\s+(.*)\s+(.*)}){
         my $before = $1;
