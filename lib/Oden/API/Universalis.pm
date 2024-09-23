@@ -1,11 +1,13 @@
 package Oden::API::Universalis;
-use strict;
-use warnings;
+use 5.40.0;
 
+use Function::Parameters;
+use Function::Return;
 use Furl;
 use HTTP::Request::Common;
 use JSON::XS qw/decode_json/;
 use Time::Piece;
+use Types::Standard -types;
 
 =head1 NAME
 
@@ -61,15 +63,13 @@ use Time::Piece;
 
 =cut
 
-sub current_data {
-    my ($class, $params) = @_;
-
+fun current_data(ClassName $class, HashRef $params) :Return(Maybe[HashRef]){
     my $item_ids    = $params->{item_ids};
     my $world_or_dc = $params->{world_or_dc};
 
-    return unless $item_ids;
-    return unless (ref $item_ids eq 'ARRAY');
-    return unless ($world_or_dc);
+    return undef unless $item_ids;
+    return undef unless (ref $item_ids eq 'ARRAY');
+    return undef unless ($world_or_dc);
 
     my $listings        = $params->{listings};
     my $entries         = $params->{entries};
@@ -92,7 +92,7 @@ sub current_data {
        $stats_within    ? ( statsWithin => $entries_within  ) : (),
     });
 
-    return unless $res;
+    return undef unless $res;
     my @entry = sort {
         $a->{pricePerUnit} <=> $b->{pricePerUnit},
     }
@@ -105,7 +105,7 @@ sub current_data {
             retainerCity   => $_->{retainerCity},
             total          => $_->{total},
             hq             => $_->{hq} ? 1 : 0,
-            worldName      => $_->{worldName},
+            worldName      => $_->{worldName} || $world_or_dc, #case In world search when world_name is not set.
         }
     } @{ $res->{listings} };
 
