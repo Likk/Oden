@@ -25,6 +25,8 @@ use Types::Standard -types;
 
 =head3 parameters
 
+=head4 required
+
 =over
 
 =item B<item_ids>
@@ -34,6 +36,17 @@ use Types::Standard -types;
 =item B<world_or_dc>
 
   required world or dc name
+
+=back
+
+=head4 optional
+
+=over
+
+=item B<max_records>
+
+  interger. The number of records to return.
+    default: a maximum of 5 records will be returned.
 
 =item B<listings>
 
@@ -66,6 +79,7 @@ use Types::Standard -types;
 fun current_data(ClassName $class, HashRef $params) :Return(Maybe[HashRef]){
     my $item_ids    = $params->{item_ids};
     my $world_or_dc = $params->{world_or_dc};
+    my $max_records = $params->{max_records} || 5;
 
     return undef unless $item_ids;
     return undef unless (ref $item_ids eq 'ARRAY');
@@ -93,7 +107,7 @@ fun current_data(ClassName $class, HashRef $params) :Return(Maybe[HashRef]){
     });
 
     return undef unless $res;
-    my @entry = sort {
+    my @records = sort {
         $a->{pricePerUnit} <=> $b->{pricePerUnit},
     }
     map {
@@ -109,20 +123,12 @@ fun current_data(ClassName $class, HashRef $params) :Return(Maybe[HashRef]){
         }
     } @{ $res->{listings} };
 
-    #XXX: might parameterized $entry on current method.
-    $#entry = 4 if $#entry > 4;
+    $#records = $max_records - 1 if $max_records < $#records;
 
     my $lastUploadTime = localtime(int($res->{lastUploadTime} /1000))->strftime('%Y/%m/%d %H:%M'); ;
     my $data = +{
-        entry => \@entry,
+        records => \@records,
         lastUploadTime => $lastUploadTime,
-        #'averagePrice'
-        #'averagePriceHQ'
-        #'averagePriceNQ'
-        #'currentAveragePrice'
-        #'currentAveragePriceHQ'
-        #'currentAveragePriceNQ'
-        #'hqSaleVelocity'
     };
     return $data;
 }

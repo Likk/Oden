@@ -88,16 +88,16 @@ describe 'about Oden::API::Universalis#current_data' => sub {
 
                 isa_ok $res, 'HASH', 'returns sales data';
                 like $res->{lastUploadTime}, qr/\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}/, 'lastUploadTime';
-                is scalar @{$res->{entry}}, 1, 'entry';
-                for my $entry (@{$res->{entry}}) {
-                    is $entry->{onMannequin},                       0, 'onMannequin';
-                    ok $entry->{lastReviewTime},                       'lastReviewTime';
-                    is $entry->{pricePerUnit},                    300, 'pricePerUnit';
-                    is $entry->{quantity},                          1, 'quantity';
-                    is $entry->{retainerCity},                     12, 'retainerCity';
-                    is $entry->{total},                           300, 'total';
-                    is $entry->{hq},                                1, 'hq';
-                    is $entry->{worldName},      $hash->{world_or_dc}, 'worldName';
+                is scalar @{$res->{records}}, 1, 'records';
+                for my $records (@{$res->{records}}) {
+                    is $records->{onMannequin},                       0, 'onMannequin';
+                    ok $records->{lastReviewTime},                       'lastReviewTime';
+                    is $records->{pricePerUnit},                    300, 'pricePerUnit';
+                    is $records->{quantity},                          1, 'quantity';
+                    is $records->{retainerCity},                     12, 'retainerCity';
+                    is $records->{total},                           300, 'total';
+                    is $records->{hq},                                1, 'hq';
+                    is $records->{worldName},      $hash->{world_or_dc}, 'worldName';
                 }
             };
         };
