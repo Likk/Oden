@@ -42,7 +42,7 @@ on 'test' => sub {
     # ./t layer
     requires 'Test::Exception';
     requires 'Test::Spec';
-
+    requires 'Test::Warn';
     # ./xt layer
     requires 'Test::More';
     requires 'Test::Perl::Critic';
