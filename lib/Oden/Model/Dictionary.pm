@@ -56,6 +56,9 @@ method dictionaly_path(Str $path) :Return(Str){
     return $self->{dic_dir} ||= $path;
 }
 
+
+=back
+
 =head1 METHODS
 
 =head2 create_stored_file
