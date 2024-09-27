@@ -1,6 +1,9 @@
 package Oden::Command::AYT;
-use strict;
-use warnings;
+use 5.40.0;
+
+use Function::Parameters;
+use Function::Return;
+use Types::Standard -types;
 
 =head1 NAME
 
@@ -17,17 +20,14 @@ use warnings;
 =head2 run
 
   Its main talking method.
+  If you say 'Are You There?' to Oden, Oden will respond with '[yes]'.
 
 =cut
 
-sub run {
-    my $class = shift;
-    my $hear  = shift;
-    return unless $hear;
-    return $hear =~ m{^([/!])?(A(?:re)*|R)(?:\s*)(Y(?:ou)*|U)(?:\s*)T(?:here)?(?:\?)?$}i ? '[yes]' : '';
+fun run(ClassName $class, Str $content = return undef) :Return(Maybe[Str]) {
+    return unless $content;
+    return $content =~ m{^([/!])?(A(?:re)*|R)(?:\s*)(Y(?:ou)*|U)(?:\s*)T(?:here)?(?:\?)?$}i ? '[yes]' : '';
 }
-
-1;
 
 =head1 SEE ALSO
 
