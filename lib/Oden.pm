@@ -1,11 +1,9 @@
 package Oden;
-use strict;
-use warnings;
+use 5.40.0;
 use utf8;
 
-use Encode qw/encode_utf8/;
-use FindBin;
-use URI::Escape;
+use Function::Parameters;
+use Function::Return;
 
 use Oden::API::Discord;
 use Oden::Command::AYT;
@@ -13,6 +11,16 @@ use Oden::Dispatcher;
 use Oden::Logger;
 use Oden::Preload;
 use Oden::Util::PlayList;
+
+use Types::Standard -types;
+
+#For Function::(Parameters|Return) InstanceOf
+use constant {
+    "Oden"                 => InstanceOf['Oden'],
+    "Oden::API::Discord"   => InstanceOf['Oden::API::Discord'],
+    "Oden::Logger"         => InstanceOf['Oden::Logger'],
+    "Oden::Util::PlayList" => InstanceOf['Oden::Util::PlayList'],
+};
 
 =head1 NAME
 
@@ -38,11 +46,9 @@ use Oden::Util::PlayList;
 
 =cut
 
-sub new {
-    my ($class, %args) = @_;
-    my $self = bless {%args}, $class;
-    return $self;
-}
+method new(%args) :Return(Oden) {
+    return bless {%args}, $self;
+};
 
 =head1 METHODS
 
@@ -50,52 +56,60 @@ sub new {
 
 =cut
 
-sub talk {
-    my ($self, $content, $guild_id, $username) = @_;
-
-    my $res;
+method talk(Str $content, Int $guild_id, Str $username) :Return(Maybe[Str]) {
+    return undef unless $content;
 
     # ping.
-    if($res = Oden::Command::AYT->run($content)){
+    if(my $res = Oden::Command::AYT->run($content)){
         return $res;
     }
 
+    my ($command, $message);
     if($content =~ m{\A/(\w+)\z}){
-        my $command = $1;
-        my $package = Oden::Dispatcher->dispatch($command) or return;
-        $res = $package->run('', $guild_id, $username);
+        $command = $1;
+        $message = '';
     }
-    elsif($content =~ m{^/(\w+)?\s+(.*)}){
-        my $command = $1;
-        my $message = $content;
-        $message =~ s{/$1\s}{};
-        my $package = Oden::Dispatcher->dispatch($command) or return;
-        $res = $package->run($message, $guild_id, $username);
-    }
-    return $res;
-}
-
-sub discord {
-    my $self = shift;
-    return $self->{_discord} ||= do {
-        Oden::API::Discord->new(
-            token => $self->{token},
-        );
-    };
-}
-
-sub playlist {
-    my $self = shift;
-    return $self->{_playlist} ||= do {
-        Oden::Util::PlayList->new();
-    }
-}
-
-sub logger {
-    my $self = shift;
-    return $self->{_logger} ||= do {
-        Oden::Logger->new();
+    if($content =~ m{^/(\w+)?\s+(.*)}){
+        $command = $1;
+        $message = $2;
     }
 
+    my $package = Oden::Dispatcher->dispatch($command);
+    return unless $package;
+
+    return $package->run($message, $guild_id, $username);
 }
-1;
+
+=head1 Alias and instance chache methods
+
+=head2 discord
+
+  shortcut for Oden::API::Discord.
+
+=cut
+
+method discord() :Return(Oden::API::Discord) {
+    return $self->{_discord} ||= Oden::API::Discord->new(
+        token => $self->{token},
+    );
+}
+
+=head2 logger
+
+  shortcut for Oden::Logger.
+
+=cut
+
+method logger() :Return(Oden::Logger) {
+    return $self->{_logger} ||= Oden::Logger->new();
+}
+
+=head2 playlist
+
+  shortcut for Oden::Util::PlayList.
+
+=cut
+
+method playlist() :Return(Oden::Util::PlayList) {
+    return $self->{_playlist} ||= Oden::Util::PlayList->new();
+}
