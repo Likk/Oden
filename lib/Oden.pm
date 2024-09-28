@@ -16,10 +16,11 @@ use Types::Standard -types;
 
 #For Function::(Parameters|Return) InstanceOf
 use constant {
-    "Oden"                 => InstanceOf['Oden'],
-    "Oden::API::Discord"   => InstanceOf['Oden::API::Discord'],
-    "Oden::Logger"         => InstanceOf['Oden::Logger'],
-    "Oden::Util::PlayList" => InstanceOf['Oden::Util::PlayList'],
+    "Oden"                               => InstanceOf['Oden'],
+    "Oden::API::Discord"                 => InstanceOf['Oden::API::Discord'],
+    "Oden::Entity::CommunicationEmitter" => InstanceOf['Oden::Entity::CommunicationEmitter'],
+    "Oden::Logger"                       => InstanceOf['Oden::Logger'],
+    "Oden::Util::PlayList"               => InstanceOf['Oden::Util::PlayList'],
 };
 
 =head1 NAME
@@ -56,7 +57,7 @@ method new(%args) :Return(Oden) {
 
 =cut
 
-method talk(Str $content, Int $guild_id, Str $username) :Return(Maybe[Str]) {
+method talk(Str $content, Int $guild_id, Str $username) :Return(Maybe[Str]|Oden::Entity::CommunicationEmitter) {
     return undef unless $content;
 
     # ping.

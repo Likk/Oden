@@ -75,8 +75,8 @@ $bot->on('message_create', sub {
     my $res_type = ref $res;
 
     # レスポンスが Oden::Response::Dictionary の場合はファイルを添付して送信
-    if($res->isa('Oden::Response::Dictionary')){
-        my $filename = $res->{filename};
+    if($res->isa('Oden::Entity::CommunicationEmitter::FileDownload')){
+        my $filename = $res->filename;
         $discord->send_attached_file($data->{channel_id}, $filename, 'dictionary.tsv');
 
         # 基本的に不要なはず

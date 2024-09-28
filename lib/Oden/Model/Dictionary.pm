@@ -68,7 +68,7 @@ method dictionaly_path(Str $path) :Return(Str){
 =cut
 
 method create_stored_file() :Return(Str){
-    my ($fh, $filename) = tempfile(SUFFIX => '.tsv', UNLINK => 1);
+    my ($fh, $filename) = tempfile(SUFFIX => '.tsv', UNLINK => 0);
     my $tsv        = Text::CSV_XS->new(+{
         binary   => 1,
         sep_char => "\t",

@@ -4,7 +4,7 @@ use warnings;
 
 use Oden::API::Universalis;
 use Oden::Model::Dictionary;
-use Oden::Response::Dictionary;
+use Oden::Entity::CommunicationEmitter::FileDownload;
 
 =head1 NAME
 
@@ -37,9 +37,8 @@ sub run {
 
     if($hear =~ m{\Afile\z}){
         my $filename = $dict->create_stored_file();
-        $talk = Oden::Response::Dictionary->new(+{
+        $talk = Oden::Entity::CommunicationEmitter::FileDownload->new(+{
             filename    => $filename,
-            auto_remove => 1
         });
     }
     elsif($hear =~ m{\A(?:rename|move)\s+(.*)\s+(.*)}){
