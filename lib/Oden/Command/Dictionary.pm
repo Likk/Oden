@@ -12,10 +12,9 @@ use Oden::Entity::CommunicationEmitter::FileDownload;
 use Types::Standard -types;
 
 use constant {
-    "Oden"                               => InstanceOf['Oden'],
-    "Oden::API::Universalis"             => InstanceOf['Oden::API::Universalis'],
-    "Oden::Model::Dictionary"            => InstanceOf['Oden::Model::Dictionary'],
-    "Oden::Entity::CommunicationEmitter" => InstanceOf['Oden::Entity::CommunicationEmitter'],
+    "Oden"                                => InstanceOf['Oden'],
+    "Oden::Entity::CommunicationReceiver" => InstanceOf['Oden::Entity::CommunicationReceiver'],
+    "Oden::Entity::CommunicationEmitter"  => InstanceOf['Oden::Entity::CommunicationEmitter'],
 };
 
 =head1 NAME
@@ -36,7 +35,9 @@ use constant {
 
 =cut
 
-fun run(ClassName $class, Str $hear, Int $guild_id, Str $username) :Return(Maybe[Oden::Entity::CommunicationEmitter]) {
+fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) :Return(Maybe[Oden::Entity::CommunicationEmitter]) {
+    my $hear     = $receiver->message;
+    my $guild_id = $receiver->guild_id;
     return unless $hear;
 
     my $dict = Oden::Model::Dictionary->new({ file_name => $guild_id});
@@ -67,7 +68,7 @@ fun run(ClassName $class, Str $hear, Int $guild_id, Str $username) :Return(Maybe
                  : 'not registrated'
         );
     }
-    elsif($hear =~ m{(?:add|set)\s([^\s]+)\s+}){
+    elsif($hear =~ m{\A(?:add|set)\s([^\s]+)\s+}){
         my $key    = $1;
         my $value  = $hear;
         $value =~s{(add|set)\s+$key\s*}{};
@@ -77,7 +78,7 @@ fun run(ClassName $class, Str $hear, Int $guild_id, Str $username) :Return(Maybe
                  : 'the key already exists'
         );
     }
-    elsif($hear =~ m{(?:overwrite)\s([^\s]+)\s+}){
+    elsif($hear =~ m{\A(?:overwrite)\s([^\s]+)\s+}){
         my $key    = $1;
         my $value  = $hear;
         $value =~s{(overwrite)\s+$key\s*}{};
@@ -87,8 +88,8 @@ fun run(ClassName $class, Str $hear, Int $guild_id, Str $username) :Return(Maybe
                  : 'not registrated'
         );
     }
-    elsif($hear =~ m{(?:delete|remove)\s+(.+)}){
-        my $key    = $1; 
+    elsif($hear =~ m{\A(?:delete|remove)\s+(.+)}){
+        my $key    = $1;
         my $res = $dict->remove($key);
         $entity->message(
             $res ? 'removed'

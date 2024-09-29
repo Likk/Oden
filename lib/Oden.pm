@@ -1,12 +1,15 @@
 package Oden;
 use 5.40.0;
+use feature qw(try);
 use utf8;
 
+use Carp;
 use Function::Parameters;
 use Function::Return;
 
 use Oden::API::Discord;
 use Oden::Command::AYT;
+use Oden::Entity::CommunicationReceiver;
 use Oden::Dispatcher;
 use Oden::Logger;
 use Oden::Preload;
@@ -78,7 +81,25 @@ method talk(Str $content, Int $guild_id, Str $username) :Return(Maybe[Str]|Oden:
     my $package = Oden::Dispatcher->dispatch($command);
     return unless $package;
 
-    return $package->run($message, $guild_id, $username);
+    my $entity = Oden::Entity::CommunicationReceiver->new(
+        message  => $message,
+        guild_id => $guild_id,
+        username => $username,
+    );
+
+    try {
+        my $res = $package->run($message, $guild_id, $username);
+        return $res;
+    }
+    catch ($e){
+    };
+
+    try {
+        my $emitter =  $package->run($entity);
+        return $emitter;
+    }
+    catch ($e){
+    };
 }
 
 =head1 Alias and instance chache methods
