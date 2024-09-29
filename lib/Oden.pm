@@ -79,7 +79,7 @@ method talk(Str $content, Int $guild_id, Str $username) :Return(Maybe[Str]|Oden:
     }
 
     my $package = Oden::Dispatcher->dispatch($command);
-    return unless $package;
+    return undef unless $package;
 
     my $entity = Oden::Entity::CommunicationReceiver->new(
         message  => $message,
@@ -99,6 +99,7 @@ method talk(Str $content, Int $guild_id, Str $username) :Return(Maybe[Str]|Oden:
         return $emitter;
     }
     catch ($e){
+        warn $e;
     };
 }
 
