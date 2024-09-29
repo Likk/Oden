@@ -50,7 +50,7 @@ use Class::Accessor::Lite (
 
 =cut
 
-method as_content() :Return(Str) {
+method as_content() :Return(Maybe[Str]) {
     return $self->mention_flag ? $self->as_content_with_mention : $self->message;
 }
 
@@ -63,3 +63,14 @@ method as_content() :Return(Str) {
 method as_content_with_mention() :Return(Str) {
     return sprintf("%s @%s", $self->message, $self->username);
 }
+
+=head1 is_empty
+
+  is_empty method returns a boolean value that represents whether the message is empty.
+
+=cut
+
+method is_empty() :Return(Bool) {
+    return $self->message ? 0 : 1;
+}
+
