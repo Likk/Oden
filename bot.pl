@@ -71,16 +71,14 @@ $bot->on('message_create', sub {
 
     return unless($res);
 
-    # Oden からのレスポンスによって返答の挙動を変えたい
-    my $res_type = ref $res;
-
     # レスポンスが Oden::Response::Dictionary の場合はファイルを添付して送信
     if($res->isa('Oden::Entity::CommunicationEmitter::FileDownload')){
         my $filename = $res->filename;
         $discord->send_attached_file($data->{channel_id}, $filename, 'dictionary.tsv');
-
-        # 基本的に不要なはず
-        unlink $filename;
+    }
+    # レスポンスが Oden::Response::CommunicationEmitter の場合は as_content() が返信本文
+    if($res->isa('Oden::Entity::CommunicationEmitter')){
+        $client->send($data->{channel_id}, $res->as_content);
     }
     else { #型がなければ通常のテキスト返信
         $client->send($data->{channel_id}, $res) if $res
