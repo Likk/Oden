@@ -38,7 +38,7 @@ use constant {
 fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) :Return(Maybe[Oden::Entity::CommunicationEmitter]) {
     my $hear     = $receiver->message;
     my $guild_id = $receiver->guild_id;
-    return unless $hear;
+    return undef unless $hear;
 
     my $dict = Oden::Model::Dictionary->new({ file_name => $guild_id});
 
