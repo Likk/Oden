@@ -9,12 +9,12 @@ use Storable qw/retrieve/;
 
 local $ENV{DICT_DIR} = '/tmp/oden_model_dictionary';
 
-describe 'about Oden::Model::Dictionary#create_stored_file' => sub {
+describe 'about Oden::Model::Dictionary#create_tsv_file' => sub {
     my $hash;
     share %$hash;
 
     before all => sub {
-        $hash->{file} = 'create_stored_file.dat';
+        $hash->{file} = 'create_tsv_file.dat';
         mkdir $ENV{DICT_DIR} if !-d $ENV{DICT_DIR};
 
         my $dictionary = Oden::Model::Dictionary->new(+{
@@ -30,9 +30,9 @@ describe 'about Oden::Model::Dictionary#create_stored_file' => sub {
 
     context 'Positive testing' => sub {
         context 'case empty dictionary' => sub {
-            it 'when create empty create_stored_file' => sub {
+            it 'when create empty create_tsv_file' => sub {
                 my $dictionary = $hash->{dictionary};
-                my $filename = $dictionary->create_stored_file();
+                my $filename = $dictionary->create_tsv_file();
                 my $tsv = do {
                     local $/;
                     open my $fh, '<', $filename;
@@ -45,9 +45,9 @@ describe 'about Oden::Model::Dictionary#create_stored_file' => sub {
             before all => sub {
                 $hash->{dictionary}->set('foo' => 'bar');
             };
-            it 'when create create_stored_file' => sub {
+            it 'when create create_tsv_file' => sub {
                 my $dictionary = $hash->{dictionary};
-                my $filename = $dictionary->create_stored_file();
+                my $filename = $dictionary->create_tsv_file();
                 my $tsv = do {
                     local $/;
                     open my $fh, '<', $filename;

@@ -23,8 +23,8 @@ describe 'about Oden::Command::Dictionary#run' => sub {
             $hash->{receiver} = $receiver;
 
             Oden::Model::Dictionary->stubs({
-                create_stored_file => sub {
-                    return '/tmp/foo/bar'
+                create_tsv_file => sub {
+                    return '/tmp/foo/bar.tsv'
                 },
             });
         };
@@ -32,7 +32,7 @@ describe 'about Oden::Command::Dictionary#run' => sub {
         it 'when returns undef' => sub {
             my $entity = Oden::Command::Dictionary->run($hash->{receiver});
             isa_ok $entity, 'Oden::Entity::CommunicationEmitter::FileDownload', 'instance is Oden::Entity::CommunicationEmitter::FileDownload';
-            is     $entity->filename, '/tmp/foo/bar', 'file value';
+            is     $entity->filename, '/tmp/foo/bar.tsv', 'file value';
         };
     };
 };

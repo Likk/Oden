@@ -43,7 +43,7 @@ fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) :Return
     my $dict = Oden::Model::Dictionary->new({ file_name => $guild_id});
 
     if($hear =~ m{\Afile\z}){
-        my $filename = $dict->create_stored_file();
+        my $filename = $dict->create_tsv_file();
         my $entity = Oden::Entity::CommunicationEmitter::FileDownload->new(+{
             filename    => $filename,
         });

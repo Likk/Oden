@@ -2,6 +2,7 @@ package Oden::Model::Dictionary;
 use 5.40.0;
 use utf8;
 use autodie;
+use feature qw/try/;
 
 use Encode;
 use File::Temp qw/tempfile/;
@@ -61,13 +62,13 @@ method dictionaly_path(Str $path) :Return(Str){
 
 =head1 METHODS
 
-=head2 create_stored_file
+=head2 create_tsv_file
 
-  create (n)stored file from dictionary.
+  create tsv file from dictionary.
 
 =cut
 
-method create_stored_file() :Return(Str){
+method create_tsv_file() :Return(Str){
     my ($fh, $filename) = tempfile(SUFFIX => '.tsv', UNLINK => 0);
     my $tsv        = Text::CSV_XS->new(+{
         binary   => 1,
@@ -185,7 +186,7 @@ method move(Str $before, Str $after) :Return(Bool){
 sub _dictionary {
     my ($self) = @_;
     my $dictionary;
-    eval {
+    try {
         my $file    = $self->_file;
         if(-s $file){
             $dictionary = lock_retrieve($file);
@@ -193,13 +194,14 @@ sub _dictionary {
         else {
             $dictionary = +{};
         }
-    };
-    if($@){
-        my $e = $@;
+    }
+    catch ($e) {
         if($e =~ m{No such file or directory}){
             $dictionary = +{};
         }
-    }
+        #TODO: not FileIO Error
+    };
+
     return $dictionary;
 }
 
