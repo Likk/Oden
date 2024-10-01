@@ -99,11 +99,3 @@ fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) :Return
 
     return $entity;
 }
-
-1;
-
-=head1 SEE ALSO
-
-  Oden
-
-=cut
