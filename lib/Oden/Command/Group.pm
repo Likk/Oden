@@ -1,10 +1,17 @@
 package Oden::Command::Group;
-use strict;
-use warnings;
-use 5.30.2;
+use 5.40.0;
 
+use Function::Parameters;
+use Function::Return;
 use List::Util;
+use Oden::Entity::CommunicationEmitter;
 use Text::Trim;
+use Types::Standard -types;
+
+use constant {
+    "Oden::Entity::CommunicationReceiver" => InstanceOf['Oden::Entity::CommunicationReceiver'],
+    "Oden::Entity::CommunicationEmitter"  => InstanceOf['Oden::Entity::CommunicationEmitter'],
+};
 
 =head1 NAME
 
@@ -24,32 +31,38 @@ use Text::Trim;
 
 =cut
 
-sub run {
-    my $class = shift;
-    my $hear  = shift;
-    my $talk;
+fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) :Return(Maybe[Oden::Entity::CommunicationEmitter]) {
+    my $hear   = $receiver->message;
+    my $entity = Oden::Entity::CommunicationEmitter->new;
 
-    if($hear =~ m{^(?<number>\d+(?:\s+))?(?<names>.*)$}){
-        my $number = Text::Trim::trim($+{number} || 2);
-        my @names  = split /[\s,]+/, Text::Trim::trim($+{names} || '');
-        return unless scalar @names;
+    if($hear =~ m{^(?<number>\d+(?:\s+))?(?<names>.+)$}){
+        my $number =                 Text::Trim::trim($+{number} || 2);
+        my @names  = split /[\s,]+/, Text::Trim::trim($+{names}  || '');
 
-        my $groups = $class->make_groups({
+        return $entity unless $number;
+        return $entity unless scalar @names;
+
+        my $groups = $class->make_groups(
             size    => $number,
             members => \@names,
-        });
+        );
+        return $entity unless $groups;
+
+        my $talk = '';
         my $group_num = 1;
         for my $group (@$groups){
             $talk .= sprintf("Group %d: %s\n", $group_num , join ', ', @$group);
             $group_num++;
         }
-        return $talk;
+        chomp $talk;
+        $entity->message($talk);
     }
+
+    return $entity;
 }
 
 
 =head2 make_groups
-
 
   make_groups is supported random grouping generator.
 
@@ -61,33 +74,13 @@ sub run {
 
 =cut
 
-sub make_groups {
-    my ($class, $args) = @_;
-    my $size    = $args->{size};
-    my $members = $args->{members};
+fun make_groups(ClassName $class, Int :$size, ArrayRef[Str] :$members) :Return(Maybe[ArrayRef[ArrayRef[Str]]]) {
+    return undef unless scalar @$members;
 
-    # Validation
-    ## $size is required, is Int and greater than 1
-    return unless $size;
-    return unless $size =~ m{^\d+$};
-
-    ## $names is required, is ArrayRef and not empty.
-    return unless $members;
-    return unless ref $members eq 'ARRAY';
-    return unless scalar @$members;
-
-    my $groups = [map { [] } 1..$size];
+    my $groups = [];
     $members = [ List::Util::shuffle(@$members) ];
     for my $i (0..$#{$members}){
         push @{$groups->[$i % $size]}, $members->[$i];
     }
     return $groups;
 }
-
-1;
-
-=head1 SEE ALSO
-
-  L<Oden>
-
-=cut
