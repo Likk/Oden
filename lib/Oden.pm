@@ -69,14 +69,11 @@ method talk(Str $content, Int $guild_id, Str $username) :Return(Maybe[Str]|Oden:
     }
 
     my ($command, $message);
-    if($content =~ m{\A/(\w+)\z}){
-        $command = $1;
-        $message = '';
+    if($content =~ m{\A/(?<command>\w+)(?:\s+(?<message>.*))?\z}){
+        $command = $+{command} || '';
+        $message = $+{message} || '';
     }
-    if($content =~ m{^/(\w+)?\s+(.*)}){
-        $command = $1;
-        $message = $2;
-    }
+    return undef unless $command;
 
     my $package = Oden::Dispatcher->dispatch($command);
     return undef unless $package;
