@@ -44,7 +44,7 @@ use Class::Accessor::Lite (
 
 =head1 METHODS
 
-=head1 as_content
+=head2 as_content
 
   as_content method returns a string that represents the content of the message to be sent.
 
@@ -54,7 +54,7 @@ method as_content() :Return(Maybe[Str]) {
     return $self->mention_flag ? $self->as_content_with_mention : $self->message;
 }
 
-=head1 as_content_with_mention
+=head2 as_content_with_mention
 
   as_content_with_mention method returns a string that represents the content of the message to be sent with mention.
 
@@ -64,7 +64,7 @@ method as_content_with_mention() :Return(Str) {
     return sprintf("%s @%s", $self->message, $self->username);
 }
 
-=head1 is_empty
+=head2 is_empty
 
   is_empty method returns a boolean value that represents whether the message is empty.
 
@@ -72,5 +72,15 @@ method as_content_with_mention() :Return(Str) {
 
 method is_empty() :Return(Bool) {
     return $self->message ? 0 : 1;
+}
+
+=head2 add_mention
+
+  add_mention method adds a mention flag to the message.
+
+=cut
+
+method add_mention() :Return(Bool) {
+    $self->mention_flag(1);
 }
 
