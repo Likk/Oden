@@ -42,8 +42,8 @@ our $DISPATCH = +{
     'fishing'    => 'Fishing',
     'market'     => 'MarketBoard',
     'dict'       => 'Dictionary',
-    'place'      => 'Place',
-    'choice'     => 'Place',
+    'place'      => 'Choice',
+    'choice'     => 'Choice',
     'dice'       => 'Dice',
     'group'      => 'Group',
 };
