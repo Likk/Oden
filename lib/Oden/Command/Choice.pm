@@ -1,4 +1,4 @@
-package Oden::Command::Place;
+package Oden::Command::Choice;
 use 5.40.0;
 
 use Function::Parameters;
