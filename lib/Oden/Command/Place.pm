@@ -1,15 +1,24 @@
 package Oden::Command::Place;
-use strict;
-use warnings;
-use 5.30.2;
+use 5.40.0;
+
+use Function::Parameters;
+use Function::Return;
+use List::Util qw/shuffle/;
+use Oden::Entity::CommunicationEmitter;
+use Types::Standard -types;
+
+use constant {
+    "Oden::Entity::CommunicationReceiver" => InstanceOf['Oden::Entity::CommunicationReceiver'],
+    "Oden::Entity::CommunicationEmitter"  => InstanceOf['Oden::Entity::CommunicationEmitter'],
+};
 
 =head1 NAME
 
-  Oden::Command::Place - random choice DataCenter.
+  Oden::Command::Place - random choice
 
 =head1 DESCRIPTION
 
-  Oden::Command::Place is random sampling DataCenter's name.
+  Oden::Command::Place is random sampling.
 
 =cut
 
@@ -21,28 +30,13 @@ use 5.30.2;
 
 =cut
 
-sub run {
-    my $class = shift;
-    my $hear  = shift;
-    my $talk;
+fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) : Return(Oden::Entity::CommunicationEmitter) {
+    my $message = $receiver->message;
+    my $entity  = Oden::Entity::CommunicationEmitter->new();
 
-    # 元GAIA民用。sampling gaia or meteor.
-    unless($hear){
-        $talk = List::Util::shuffle(qw/Gaia Meteor/);
-        return $talk;
-    }
+    $entity->message(
+        List::Util::shuffle(split /[\s,]+/, $message) || '',
+    );
 
-    # 通常の使い方はこっち
-    my $list = [split /[\s,]+/, $hear];
-    $talk = List::Util::shuffle(@$list);
-
-    return $talk;
+    return $entity;
 }
-
-1;
-
-=head1 SEE ALSO
-
-  L<Oden>
-
-=cut
