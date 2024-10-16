@@ -17,15 +17,12 @@ describe 'about Oden::Dispatcher::dispatch' => sub {
             'fishing'    => 'Fishing',
             'market'     => 'MarketBoard',
             'dict'       => 'Dictionary',
-            'place'      => 'Place',
-            'choice'     => 'Place',
+            'place'      => 'Choice',
+            'choice'     => 'Choice',
             'dice'       => 'Dice',
             'group'      => 'Group',
         };
     };
-
-    #context 'Negative testing' => sub {
-    #};
 
     context 'Positive testing' => sub {
         context 'GLOBAL VARIABLE' => sub {

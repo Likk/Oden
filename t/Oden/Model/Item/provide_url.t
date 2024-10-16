@@ -3,18 +3,11 @@ use warnings;
 use utf8;
 
 use Test::Spec;
-
-# import でファイル読み込みを行うので、テストでは直前まで読み込まないようにする
-use Oden::Model::Item();
+use Oden::Model::Item;
 
 describe 'about Oden::Model::Item#(.+)_url' => sub {
     my $hash;
     share %$hash;
-
-    before all => sub {
-        local $ENV{DATA_DIR} = './t/Oden/Model/Item/data';
-        Oden::Model::Item->import;
-    };
 
     context "negative testing" => sub {
         before all => sub {
