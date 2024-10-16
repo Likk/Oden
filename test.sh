@@ -2,7 +2,7 @@
 set -ue
 
 if [ $# -gt 0 ]; then
-  ./env.sh forkprove -MOden::Preload -lvr $1
+  ./env.sh forkprove -vr $1
 else
-  ./env.sh forkprove -MOden::Preload -lvr ./t
+  ./env.sh forkprove -r ./t
 fi

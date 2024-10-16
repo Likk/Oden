@@ -4,122 +4,78 @@ use utf8;
 
 use Test::Spec;
 
-use Oden::Model::Item;
+# import でファイル読み込みを行うので、テストでは直前まで読み込まないようにする
+use Oden::Model::Item();
 
-describe 'about Oden::Model::Item#(.+)_url ja' => sub {
+describe 'about Oden::Model::Item#(.+)_url' => sub {
     my $hash;
     share %$hash;
 
     before all => sub {
-        $hash->{item} = Oden::Model::Item->lookup_item_by_name('ララフェルカフタン');
+        local $ENV{DATA_DIR} = './t/Oden/Model/Item/data';
+        Oden::Model::Item->import;
     };
 
-    context 'case call lodestone_url' => sub {
-        it 'when returns offical lodestone url' => sub {
-            my $url = $hash->{item}->lodestone_url;
-            is $url, "https://jp.finalfantasyxiv.com/lodestone/playguide/db/item/53b2d7504a1/";
+    context "negative testing" => sub {
+        before all => sub {
+            my $lang_to_name = {
+                jp => "アンティークメイル",
+                na => "Antique Mail",
+                de => "Antike Rüstung",
+                fr => "Maille archaïque",
+            };
+            $hash->{lang_to_name} = $lang_to_name;
+
+        };
+
+        for my $lang (qw/jp na de fr/) {
+            context "call miraprisnap_url $lang" => sub {
+                before all => sub {
+                    $hash->{item} = Oden::Model::Item->lookup_item_by_name($hash->{lang_to_name}->{$lang});
+                };
+                it "when returns undef. it is not equipment item" => sub {
+                    my $url = $hash->{item}->miraprisnap_url;
+                    is $url, undef;
+                };
+            };
+        }
+    };
+
+    context "positive testing" => sub {
+        before all => sub {
+            my $lang_to_name = {
+                jp => 'ララフェルカフタン',
+                na => 'Lalafellin Kaftan',
+                de => 'Lalafell-Kaftan',
+                fr => 'Caftan lalafell',
+            };
+            $hash->{lang_to_name} = $lang_to_name;
+        };
+
+        for my $lang (qw/jp na de fr/) {
+            context "call lodestone_url $lang" => sub {
+                before all => sub {
+                    $hash->{item} = Oden::Model::Item->lookup_item_by_name($hash->{lang_to_name}->{$lang});
+                };
+                it "when returns offical lodestone url ($lang)" => sub {
+                    my $url = $hash->{item}->lodestone_url;
+                    is $url, "https://$lang.finalfantasyxiv.com/lodestone/playguide/db/item/53b2d7504a1/";
+                };
+            };
+        }
+
+        for my $lang (qw/jp na de fr/) {
+            context "case call miraprisnap_url $lang" => sub {
+                before all => sub {
+                    $hash->{item} = Oden::Model::Item->lookup_item_by_name($hash->{lang_to_name}->{$lang});
+                };
+                it "when returns miraprisnap keyword search url ($lang)" => sub {
+                    my $url = $hash->{item}->miraprisnap_url;
+                    is $url, "https://mirapri.com/?keyword=%E3%83%A9%E3%83%A9%E3%83%95%E3%82%A7%E3%83%AB%E3%82%AB%E3%83%95%E3%82%BF%E3%83%B3";
+                };
+            };
         };
     };
-
-    context 'case call miraprisnap_url' => sub {
-        it 'when returns miraprisnap keyword search url' => sub {
-            my $url = $hash->{item}->miraprisnap_url;
-            is $url, "https://mirapri.com/?keyword=%E3%83%A9%E3%83%A9%E3%83%95%E3%82%A7%E3%83%AB%E3%82%AB%E3%83%95%E3%82%BF%E3%83%B3";
-        };
-    };
-
 };
 
-describe 'about Oden::Model::Item#(.+)_url en' => sub {
-    my $hash;
-    share %$hash;
-
-    before all => sub {
-        $hash->{item} = Oden::Model::Item->lookup_item_by_name('Lalafellin Kaftan');
-    };
-
-    context 'case call lodestone_url' => sub {
-        it 'when returns offical lodestone url' => sub {
-            my $url = $hash->{item}->lodestone_url;
-            is $url, "https://na.finalfantasyxiv.com/lodestone/playguide/db/item/53b2d7504a1/";
-        };
-    };
-
-    context 'case call miraprisnap_url' => sub {
-        it 'when returns miraprisnap keyword search url' => sub {
-            my $url = $hash->{item}->miraprisnap_url;
-            is $url, "https://mirapri.com/?keyword=%E3%83%A9%E3%83%A9%E3%83%95%E3%82%A7%E3%83%AB%E3%82%AB%E3%83%95%E3%82%BF%E3%83%B3";
-        };
-    };
-
-};
-
-describe 'about Oden::Model::Item#(.+)_url de' => sub {
-    my $hash;
-    share %$hash;
-
-    before all => sub {
-        $hash->{item} = Oden::Model::Item->lookup_item_by_name('Lalafell-Kaftan');
-    };
-
-    context 'case call lodestone_url' => sub {
-        it 'when returns offical lodestone url' => sub {
-            my $url = $hash->{item}->lodestone_url;
-            is $url, "https://de.finalfantasyxiv.com/lodestone/playguide/db/item/53b2d7504a1/";
-        };
-    };
-
-    context 'case call miraprisnap_url' => sub {
-        it 'when returns miraprisnap keyword search url' => sub {
-            my $url = $hash->{item}->miraprisnap_url;
-            is $url, "https://mirapri.com/?keyword=%E3%83%A9%E3%83%A9%E3%83%95%E3%82%A7%E3%83%AB%E3%82%AB%E3%83%95%E3%82%BF%E3%83%B3";
-        };
-    };
-
-};
-
-describe 'about Oden::Model::Item#(.+)_url fr' => sub {
-    my $hash;
-    share %$hash;
-
-    before all => sub {
-        $hash->{item} = Oden::Model::Item->lookup_item_by_name('Caftan lalafell');
-    };
-
-    context 'case call lodestone_url' => sub {
-        it 'when returns offical lodestone url' => sub {
-            my $url = $hash->{item}->lodestone_url;
-            is $url, "https://fr.finalfantasyxiv.com/lodestone/playguide/db/item/53b2d7504a1/";
-        };
-    };
-
-    context 'case call miraprisnap_url' => sub {
-        it 'when returns miraprisnap keyword search url' => sub {
-            my $url = $hash->{item}->miraprisnap_url;
-            is $url, "https://mirapri.com/?keyword=%E3%83%A9%E3%83%A9%E3%83%95%E3%82%A7%E3%83%AB%E3%82%AB%E3%83%95%E3%82%BF%E3%83%B3";
-        };
-    };
-
-};
-
-
-describe 'about Oden::Model::Item#miraprisnap_url ja' => sub {
-    my $hash;
-    share %$hash;
-
-    before all => sub {
-        $hash->{item} = Oden::Model::Item->lookup_item_by_name('アンティークメイル');
-    };
-
-    context 'case call miraprisnap_url' => sub {
-        it 'when returns undef. it is not equipment item' => sub {
-            my $url = $hash->{item}->miraprisnap_url;
-            is $url, undef;
-        };
-    };
-
-};
-
-# XXX: forkprove has caller
-# runtests unless caller;
 runtests();

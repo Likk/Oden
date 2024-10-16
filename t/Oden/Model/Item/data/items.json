@@ -1,0 +1,44 @@
+{
+  "10": {
+    "en": "Allagan Tin Piece",
+    "de": "Allagisches Zinnstück",
+    "ja": "アラグ錫貨",
+    "fr": "Pièce d'étain allagoise"
+  },
+  "11": {
+    "en": "Allagan Bronze Piece",
+    "de": "Allagisches Bronzestück",
+    "ja": "アラグ銅貨",
+    "fr": "Pièce de cuivre allagoise"
+  },
+  "12": {
+    "en": "Allagan Silver Piece",
+    "de": "Allagisches Silberstück",
+    "ja": "アラグ銀貨",
+    "fr": "Pièce d'argent allagoise"
+  },
+  "13": {
+    "en": "Allagan Gold Piece",
+    "de": "Allagisches Goldstück",
+    "ja": "アラグ金貨",
+    "fr": "Pièce d'or allagoise"
+  },
+  "14": {
+    "en": "Allagan Platinum Piece",
+    "de": "Allagisches Platinstück",
+    "ja": "アラグ白金貨",
+    "fr": "Pièce de platine allagoise"
+  },
+  "20": {
+    "en": "Lalafellin Kaftan",
+    "de": "Lalafell-Kaftan",
+    "ja": "ララフェルカフタン",
+    "fr": "Caftan lalafell"
+  },
+  "21": {
+    "en": "Antique Mail",
+    "de": "Antike Rüstung",
+    "ja": "アンティークメイル",
+    "fr": "Maille archaïque"
+  }
+}
