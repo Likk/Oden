@@ -202,6 +202,27 @@ sub join_thread {
     return 1;
 }
 
+sub add_slash_command {
+    my ($self, $content, $app_id, $guild_id) = @_;
+    my $endpoint = $guild_id
+                 ? sprintf("/applications/%s/guilds/%s/commands", $app_id, $guild_id)
+                 : sprintf("/applications/%s/commands", $app_id)
+    ;
+    my $req = POST(
+        $endpoint,
+        Content_Type    => 'application/json',
+        Authorization   => sprintf("Bot %s", $self->{token}),
+        User_Agent      => $self->_user_agent->agent,
+        Content         => encode_json(+{ content => $content }),
+    );
+
+    my $res = $self->_user_agent->request($req);
+    unless($res->is_success()){
+        warn $res->status_line;
+        return ;
+    }
+    return 1;
+}
 
 =head1 PRIVATE METHODS
 
