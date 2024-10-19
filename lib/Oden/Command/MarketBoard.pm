@@ -1,11 +1,20 @@
 package Oden::Command::MarketBoard;
-use strict;
-use warnings;
-use 5.30.2;
+use 5.40.0;
 
-use Oden::Model::Item;
-use Oden::API::Universalis;
+use Function::Parameters;
+use Function::Return;
 use Number::Format;
+
+use Oden::API::Universalis;
+use Oden::Entity::CommunicationEmitter;
+use Oden::Model::Item;
+
+use Types::Standard -types;
+
+use constant {
+    "Oden::Entity::CommunicationReceiver" => InstanceOf['Oden::Entity::CommunicationReceiver'],
+    "Oden::Entity::CommunicationEmitter"  => InstanceOf['Oden::Entity::CommunicationEmitter'],
+};
 
 =head1 NAME
 
@@ -15,7 +24,22 @@ use Number::Format;
 
   Oden::Command::Marketboard
 
+=head1 PACKAGE GLOBAL VARIABLES
+
+=head2 PARSE_MARKET_PATTERN
+
+  pattern for parsing market command.
+
 =cut
+
+our $PARSE_MARKET_PATTERN = qr{
+    \A                       # start
+    (?<target>.+?)           # target
+    \s                       # space
+    (?<hq_flag>HQ)?\s?       # HQ flag
+    (?<item_name>.+)         # item name
+    \z                       # end
+}x;
 
 =head1 METHODS
 
@@ -25,54 +49,87 @@ use Number::Format;
 
 =cut
 
-sub run {
-    my $class = shift;
-    my $hear  = shift;
+fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) : Return(Oden::Entity::CommunicationEmitter) {
+    my $hear   = $receiver->message || '';
+    my $entity = Oden::Entity::CommunicationEmitter->new();
 
-    return unless $hear;
-    my $talk;
-    if($hear =~ m{(?<target>.+?)\s(?<hq_flag>HQ\s)?(?<item_name>.+)}){
-        my $world_or_dc = $+{target};
-        my $hq_flag     = $+{hq_flag} || '';
-        my $item_name   = $+{item_name};
-        my $item = Oden::Model::Item->lookup_item_by_name($item_name);
-        return $talk unless $item;
+    my ($world_or_dc, $hq_flag, $item_name) = $class->parse_message($hear);
+    return $entity unless $item_name;
 
-        return 'untradable' if(!$item->is_tradable);
+    my $item = Oden::Model::Item->lookup_item_by_name($item_name);
+    return $entity unless $item;
+    return $entity unless $item->is_tradable;
 
-        my $res = Oden::API::Universalis->current_data(+{
-            world_or_dc => $world_or_dc,
-            $hq_flag ? ( hq =>  1 ): (),
-            item_ids    => [ $item->{id} ],
-        });
+    my $res = Oden::API::Universalis->current_data(+{
+        world_or_dc => $world_or_dc,
+        $hq_flag ? ( hq =>  1 ): (),
+        item_ids    => [ $item->{id} ],
+    });
 
-        if($res){
-            $talk .= sprintf("last update: %s\n",   $res->{lastUploadTime});
-            for my $row (@{$res->{records}}){
-                $talk .= $class->_format($row, $world_or_dc);
-            }
-        }
-        else {
-            $talk .= "Oops! Cannot read response. Retry at a later time";
-        }
+    if($res){
+        my $response = $class->format_response($res);
+        $entity->message($response);
+        return $entity;
     }
-    return $talk;
+
+    $entity->message("Oops! Cannot read response. Retry at a later time");
+    return $entity;
 }
 
-sub _format {
-    my ($class, $row, $world) = @_;
-    return sprintf ("`%-10s: Gil%11s x %3s`%s\n",
-        $row->{worldName} || $world,
-        Number::Format::format_price($row->{pricePerUnit}, 0, ''),
-        $row->{quantity},
-        $row->{hq} ? '<:hq:983319334476742676>' : '',
-    );
+=head2 parse_message
+
+  parse message and return target, hq_flag, item_name.
+
+=cut
+
+fun parse_message(ClassName $class, Str $hear) : Return(Maybe[Str],Maybe[Str],Maybe[Str]) {
+    if ($hear =~ $PARSE_MARKET_PATTERN) {
+        return (
+          $+{target},
+          $+{hq_flag} || '',
+          $+{item_name}
+      );
+    }
+    return (undef, undef, undef);
 }
 
-1;
+
+=head2 format_response
+
+  format market board data.
+  Server Name, Price, Quantity, HQ
+
+=cut
+
+fun format_response(ClassName $class, HashRef $res) : Return(Str) {
+    my $records = $res->{records};
+    my $header  = sprintf("last update: %s\n", $res->{lastUploadTime} || 'none');
+    my $body    = '';
+
+    # longest worldName
+    my $max_length = [
+        sort {
+            $b <=> $a
+        }
+        map {
+            length($_->{worldName}),
+        } @$records
+    ]->[0] +1;
+    my $world_name_width = "%-${max_length}s";
+
+    for my $row (@$records){
+        $body .= sprintf ("`$world_name_width: Gil%11s x %3s`%s\n",
+            $row->{worldName},
+            Number::Format::format_price($row->{pricePerUnit}, 0, ''),
+            $row->{quantity},
+            $row->{hq} ? ' <:hq:983319334476742676>' : '',
+        );
+    }
+    return sprintf("%s\n%s", $header, $body);
+}
 
 =head1 SEE ALSO
 
-  Oden
+  Oden::API::Universalis
 
 =cut

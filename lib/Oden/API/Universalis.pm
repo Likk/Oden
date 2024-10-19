@@ -1,5 +1,6 @@
 package Oden::API::Universalis;
 use 5.40.0;
+use feature qw(try);
 
 use Function::Parameters;
 use Function::Return;
@@ -107,6 +108,7 @@ fun current_data(ClassName $class, HashRef $params) :Return(Maybe[HashRef]){
     });
 
     return undef unless $res;
+
     my @records = sort {
         $a->{pricePerUnit} <=> $b->{pricePerUnit},
     }
@@ -119,7 +121,7 @@ fun current_data(ClassName $class, HashRef $params) :Return(Maybe[HashRef]){
             retainerCity   => $_->{retainerCity},
             total          => $_->{total},
             hq             => $_->{hq} ? 1 : 0,
-            worldName      => $_->{worldName} || $world_or_dc, #case In world search when world_name is not set.
+            worldName      => $_->{worldName} || $res->{worldName}, #case In world search when world_name is not set at listings.
         }
     } @{ $res->{listings} };
 
@@ -157,11 +159,10 @@ sub _request {
         warn $res->message;
         return;
     }
-    eval {
+    try {
         $data = decode_json($res->decoded_content());
-    };
-    if($@){
-        my $e = $@;
+    }
+    catch ($e) {
         warn $e;
         return;
     }

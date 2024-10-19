@@ -74,6 +74,7 @@ describe 'about Oden::API::Universalis#current_data' => sub {
                             total          => 300,
                             tax            => 15
                         }],
+                        worldName => 'zeromus',
                     }
                 },
             });
@@ -97,7 +98,7 @@ describe 'about Oden::API::Universalis#current_data' => sub {
                     is $records->{retainerCity},                     12, 'retainerCity';
                     is $records->{total},                           300, 'total';
                     is $records->{hq},                                1, 'hq';
-                    is $records->{worldName},      $hash->{world_or_dc}, 'worldName';
+                    is $records->{worldName},                  'zeromus', 'worldName';
                 }
             };
         };
