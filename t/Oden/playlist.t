@@ -19,6 +19,13 @@ describe 'about Oden#playlist' => sub {
             isa_ok    $playlist, 'Oden::Util::PlayList', 'instance is Oden::Util::PlayList';
             is_deeply $playlist, $oden->playlist,        'same instance';
         };
+
+        it 'pick up a song' => sub {
+            my $oden = $hash->{oden};
+            my $playlist = $oden->playlist;
+            diag explain $playlist;
+            ok $playlist->pick;
+        };
     };
 };
 
