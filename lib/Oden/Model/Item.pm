@@ -1,20 +1,21 @@
 package Oden::Model::Item;
+use 5.40.0;
 use autodie;
-use strict;
-use warnings;
-use utf8;
-use 5.30.2;
-use Encode;
+
+use Function::Parameters;
+use Function::Return;
+
 use Fcntl    qw/O_RDONLY/;
 use FindBin;
 use JSON::XS qw/decode_json/;
 use Text::CSV;
 use Tie::File;
+use Types::Standard -types;
 use URI::Escape;
 
 =head1 NAME
 
-Oden::Model::Item - lookup item lodestone by name_ja.
+  Oden::Model::Item - lookup item lodestone url.
 
 =head1 DESCRIPTION
 
@@ -22,10 +23,32 @@ Oden::Model::Item - lookup item lodestone by name_ja.
 
 =cut
 
-# loading data on use.
+=head2 PACKAGE VARIABLES
+
+=over
+
+=item B<$DATA_DIR>
+
+  data directory path.
+
+=item B<$ITEM_ID_TO_NAME>
+
+  hashref of item id to name.
+    id => { lang => name }
+
+=item B<$NAME_TO_ITEM_ID>
+
+  hashref of name to item id.
+    name => { id => id, lang => lang }
+
+=item B<$ITEM_DATA>
+
+  data object of item.
+    id => { key => value }
+
+=cut
 
 our $DATA_DIR;
-our $NAME_JA_TO_ITEM_ID;
 our $ITEM_ID_TO_NAME;
 our $NAME_TO_ITEM_ID;
 our $ITEM_DATA;
@@ -84,29 +107,20 @@ sub import {
 
 =cut
 
-sub new {
-    my ($class) = @_;
-
-    my $self = bless {}, $class;
-    return $self;
+method new($class:) :Return(InstanceOf['Oden::Model::Item']) {
+    return bless {}, $class;
 }
 
-=head2 lookup_item_id_by_name_ja
+=head2 lookup_item_by_name
 
-  Creates and returns a Item object from name_ja
+  Creates and returns a Item object from name
 
 =cut
 
-sub lookup_item_by_name {
-    my ($invocant, $name) = @_;
-    return unless $name;
-
-    my $self = ref $invocant eq 'Oden::Model::Item'
-      ? $invocant
-      : $invocant->new;
-    ;
-
-    return unless $NAME_TO_ITEM_ID->{$name};
+method lookup_item_by_name(Str $name) :Return(Maybe[InstanceOf['Oden::Model::Item']]){
+    my $self = $self->new if(ref($self) ne 'Oden::Model::Item');
+    return undef unless $name;
+    return undef unless $NAME_TO_ITEM_ID->{$name};
 
     $self->{name} = $name;
     $self->{id}   = $NAME_TO_ITEM_ID->{$name}->{id};
@@ -117,26 +131,18 @@ sub lookup_item_by_name {
 
 =head2 lookup_item_by_id
 
-  Creates and returns a Item object from name_ja
+  Creates and returns a Item object from item id
 
 =cut
 
-sub lookup_item_by_id {
-    my ($invocant, $id) = @_;
-    return unless $id;
+method lookup_item_by_id(Int $id) :Return(Maybe[InstanceOf['Oden::Model::Item']]){
+    my $self = $self->new if(ref($self) ne 'Oden::Model::Item');
+    return undef unless $id;
+    return undef unless $ITEM_ID_TO_NAME->{$id};
 
-    my $self = ref $invocant eq 'Oden::Model::Item'
-      ? $invocant
-      : $invocant->new;
-    ;
-
-    my $item = $ITEM_ID_TO_NAME->{$id};
-    return unless $item;
-
-    $self->{name} = $item->{en};
+    $self->{name} = $ITEM_ID_TO_NAME->{$id}->{en};
     $self->{id}   = $id;
     $self->{lang} = 'en';
-
     $self->_item_data();
     return $self;
 }
@@ -149,9 +155,8 @@ sub lookup_item_by_id {
 
 =cut
 
-sub search_prefix_match_name {
-    my ($self, $name) = @_;
-    return unless $name;
+method search_prefix_match_name(Str $name) :Return(Maybe[ArrayRef[Str]]){
+    return undef unless $name;
 
     my $candidate;
     for my $lang (qw/ja en fr de/){
@@ -163,7 +168,7 @@ sub search_prefix_match_name {
         } values %$ITEM_ID_TO_NAME];
         last if scalar @$candidate;
     }
-    return unless scalar @$candidate;
+    return undef unless scalar @$candidate;
     return $candidate;
 }
 
@@ -175,14 +180,11 @@ sub search_prefix_match_name {
 
 =cut
 
-sub lodestone_url {
-    my $self = shift;
-    my $data_dir = $DATA_DIR;
-
+method lodestone_url() :Return(Maybe[Str]){
     my $lodestone_id = $self->_item_hash_id;
     chomp $lodestone_id;
+    return undef unless $lodestone_id;
 
-    return unless $lodestone_id;
     my $lang =
         $self->{lang} eq 'ja' ? 'jp'
       : $self->{lang} eq 'en' ? 'na'
@@ -197,8 +199,7 @@ sub lodestone_url {
 
 =cut
 
-sub ffxivteamcraft_url {
-    my $self = shift;
+method ffxivteamcraft_url() :Return(Maybe[Str]){
     return sprintf("https://ffxivteamcraft.com/db/%s/item/%s/", $self->{lang}, $self->{id});
 }
 
@@ -208,10 +209,8 @@ sub ffxivteamcraft_url {
 
 =cut
 
-sub miraprisnap_url {
-    my $self = shift;
-
-    return unless $self->is_equipment;
+method miraprisnap_url() :Return(Maybe[Str]){
+    return undef unless $self->is_equipment;
 
     my $name_ja            = $ITEM_ID_TO_NAME->{$self->{id}}->{ja};
     my $uri_escape_name_ja = URI::Escape::uri_escape_utf8($name_ja);
@@ -225,8 +224,7 @@ sub miraprisnap_url {
 
 =cut
 
-sub is_equipment {
-    my $self = shift;
+method is_equipment() :Return(Bool){
     my $equip_slot_categorys = [
     # MainHand, OffHand, Head,  Body,   Gloves, Waist,  Legs,   Feet,   Ears,   Neck,   Wrists, Finger[LR], SoulCrystal
       1,        2,       3,     4,      5,      6,      7,      8,      9,      10,     11,     12,         17,
@@ -245,9 +243,8 @@ sub is_equipment {
 
 =cut
 
-sub is_fishable {
-    my $self = shift;
-    return $self->{ItemUICategory} == 47 ? 1 : 0
+method is_fishable() :Return(Bool){
+    return $self->{ItemUICategory} == 47 ? 1 : 0;
 }
 
 =head2 is_tradable
@@ -256,8 +253,7 @@ sub is_fishable {
 
 =cut
 
-sub is_tradable {
-    my $self = shift;
+method is_tradable() :Return(Bool){
     return ($self->{IsUntradable} eq 'False') ? 1 : 0;
 }
 

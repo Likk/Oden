@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use utf8;
 
+use Test::Exception;
 use Test::Spec;
 use Oden::Model::Item;
 
@@ -10,9 +11,10 @@ describe 'about Oden::Model::Item#lookup_item_by_name' => sub {
     share %$hash;
 
     context 'case no parametor' => sub {
-        it 'when returns undef' => sub {
-            my $item = Oden::Model::Item->lookup_item_by_name();
-            is $item, undef;
+        it 'when throws exception' => sub {
+            throws_ok {
+                my $item = Oden::Model::Item->lookup_item_by_name();
+            } qr/Too few arguments for method lookup_item_by_name/;
         };
     };
 
