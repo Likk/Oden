@@ -85,13 +85,6 @@ method talk(Str $content, Int $guild_id, Str $username) :Return(Maybe[Str]|Oden:
     );
 
     try {
-        my $res = $package->run($message, $guild_id, $username);
-        return $res;
-    }
-    catch ($e){
-    };
-
-    try {
         my $emitter =  $package->run($entity);
         return $emitter;
     }

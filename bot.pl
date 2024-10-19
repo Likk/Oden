@@ -78,7 +78,8 @@ $bot->on('message_create', sub {
     }
     # レスポンスが Oden::Response::CommunicationEmitter の場合は as_content() が返信本文
     if($res->isa('Oden::Entity::CommunicationEmitter')){
-        $client->send($data->{channel_id}, $res->as_content) if !$res->is_empty;
+        return if $res->is_empty;
+        $client->send($data->{channel_id}, $res->as_content);
     }
     else { #型がなければ通常のテキスト返信
         $client->send($data->{channel_id}, $res) if $res
