@@ -4,6 +4,7 @@ use utf8;
 use Test::Exception;
 use Test::Spec;
 use Oden;
+use Oden::Logger;
 
 describe 'about Oden#logger' => sub {
     my $hash;
@@ -16,8 +17,8 @@ describe 'about Oden#logger' => sub {
         it 'should return Oden::Logger instance' => sub {
             my $oden = $hash->{oden};
             my $logger = $oden->logger;
-            isa_ok    $logger, 'Oden::Logger', 'instance is Oden::Logger';
-            is_deeply $logger, $oden->logger,  'same instance';
+            isa_ok    $logger, 'Oden::Logger',     'instance is Oden::Logger';
+            is_deeply $logger, Oden::Logger->new,  'Oden::Logger is singleton';
         };
     };
 };

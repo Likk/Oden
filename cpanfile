@@ -17,6 +17,7 @@ requires 'URI::Escape';
 
 ## util
 requires 'Array::Diff';
+requires 'Class::Singleton';
 requires 'Hash::Diff';
 requires 'File::RotateLogs';
 requires 'Function::Parameters';

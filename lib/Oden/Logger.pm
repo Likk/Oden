@@ -3,7 +3,7 @@ package Oden::Logger;
 use strict;
 use warnings;
 use utf8;
-
+use parent 'Class::Singleton';
 use JSON::XS;
 use File::RotateLogs;
 use Log::Minimal qw//;
@@ -16,12 +16,7 @@ use Log::Minimal qw//;
 
 =cut
 
-sub new {
-    my ($class, %args) = @_;
-    my $self = bless {%args}, $class;
-    $self->_create_logger();
-    return $self;
-}
+sub new { return shift->instance(@_); }
 
 {
     no strict 'refs';
