@@ -23,7 +23,6 @@ describe 'about Oden#playlist' => sub {
         it 'pick up a song' => sub {
             my $oden = $hash->{oden};
             my $playlist = $oden->playlist;
-            diag explain $playlist;
             ok $playlist->pick;
         };
     };
