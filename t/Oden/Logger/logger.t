@@ -12,11 +12,10 @@ describe 'about Oden#logger' => sub {
 
     context 'when call method' => sub {
         before all => sub {
-            $hash->{oden} = Oden->new;
+            $hash->{logger} = Oden::Logger->new;
         };
         it 'should return Oden::Logger instance' => sub {
-            my $oden = $hash->{oden};
-            my $logger = $oden->logger;
+            my $logger = $hash->{logger};
             isa_ok    $logger, 'Oden::Logger',     'instance is Oden::Logger';
             is_deeply $logger, Oden::Logger->new,  'Oden::Logger is singleton';
         };

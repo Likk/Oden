@@ -5,7 +5,6 @@ use Function::Parameters;
 use Function::Return;
 
 use Oden::Bot::Discord;
-#use Oden::Preload;
 
 use Types::Standard -types;
 
@@ -44,7 +43,6 @@ method new(%args) :Return(InstanceOf['Oden']) {
 =cut
 
 method start() {
-    use Oden::Bot::Discord;
     my $bot = Oden::Bot::Discord->new(
         token => $self->{token},
     );
