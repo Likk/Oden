@@ -1,5 +1,6 @@
 package Oden::Command::Dice;
 use 5.40.0;
+use utf8;
 
 use Function::Parameters;
 use Function::Return;

@@ -16,7 +16,11 @@ use Log::Minimal qw//;
 
 =cut
 
-sub new { return shift->instance(@_); }
+sub new {
+    my $self = shift->instance(@_);
+    $self->_create_logger;
+    return $self;
+}
 
 {
     no strict 'refs';
