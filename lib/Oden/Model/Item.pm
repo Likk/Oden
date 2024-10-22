@@ -46,6 +46,8 @@ use URI::Escape;
   data object of item.
     id => { key => value }
 
+=back
+
 =cut
 
 our $DATA_DIR;
@@ -118,7 +120,7 @@ method new($class:) :Return(InstanceOf['Oden::Model::Item']) {
 =cut
 
 method lookup_item_by_name(Str $name) :Return(Maybe[InstanceOf['Oden::Model::Item']]){
-    my $self = $self->new if(ref($self) ne 'Oden::Model::Item');
+    $self = $self->new if(ref($self) ne 'Oden::Model::Item');
     return undef unless $name;
     return undef unless $NAME_TO_ITEM_ID->{$name};
 
@@ -136,7 +138,7 @@ method lookup_item_by_name(Str $name) :Return(Maybe[InstanceOf['Oden::Model::Ite
 =cut
 
 method lookup_item_by_id(Int $id) :Return(Maybe[InstanceOf['Oden::Model::Item']]){
-    my $self = $self->new if(ref($self) ne 'Oden::Model::Item');
+    $self = $self->new if(ref($self) ne 'Oden::Model::Item');
     return undef unless $id;
     return undef unless $ITEM_ID_TO_NAME->{$id};
 
@@ -260,7 +262,7 @@ method is_tradable() :Return(Bool){
 
 =head1 PRIVATE METHODS
 
-=head1 _item_hash_id
+=head2 _item_hash_id
 
   id to lodestone hash id
 
@@ -275,7 +277,7 @@ sub _item_hash_id {
     return $hash_id;
 }
 
-=head1 _item_data
+=head2 _item_data
 
   item's detail data.
 
