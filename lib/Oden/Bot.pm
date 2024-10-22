@@ -16,6 +16,8 @@ use constant {
     "Oden::Entity::CommunicationEmitter" => InstanceOf['Oden::Entity::CommunicationEmitter'],
 };
 
+=encoding utf8
+
 =head1 NAME
 
   Oden::Bot
