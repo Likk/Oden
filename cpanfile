@@ -17,6 +17,7 @@ requires 'URI::Escape';
 
 ## util
 requires 'Array::Diff';
+requires 'Class::Singleton';
 requires 'Hash::Diff';
 requires 'File::RotateLogs';
 requires 'Function::Parameters';
@@ -40,6 +41,7 @@ on 'develop' => sub {
 on 'test' => sub {
     requires 'App::ForkProve';
     # ./t layer
+    requires 'Sub::Meta';
     requires 'Test::Exception';
     requires 'Test::Spec';
     requires 'Test::Warn';
@@ -47,5 +49,6 @@ on 'test' => sub {
     requires 'Test::More';
     requires 'Test::Perl::Critic';
     requires 'Test::Pod';
+    requires 'Test::Pod::Coverage';
     requires 'Test::Spelling';
 };

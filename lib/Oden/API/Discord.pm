@@ -39,7 +39,7 @@ sub new {
 
 =head1 METHODS
 
-=head2 enbpoint_config
+=head2 endpoint_config
 
   create named endpoint list.
 
@@ -113,7 +113,7 @@ sub show_message {
     );
 }
 
-=head2
+=head2 send_message
 
   request create message.
 
@@ -141,7 +141,7 @@ sub send_message {
 
 }
 
-=head2
+=head2 send_attached_file
 
     request create message with attachement file,
 
@@ -169,6 +169,12 @@ sub send_attached_file {
     }
     return 1;
 }
+
+=head2 join_thread
+
+  put request thread-members @me
+
+=cut
 
 sub join_thread {
     my ($self, $channel_id, ) = @_;

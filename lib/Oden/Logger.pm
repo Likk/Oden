@@ -1,14 +1,15 @@
 package Oden::Logger;
+use 5.40.0;
+use parent 'Class::Singleton';
 
-use strict;
-use warnings;
-use utf8;
-
-use JSON::XS;
+use Carp qw/croak/;
 use File::RotateLogs;
+use Function::Parameters;
+use Function::Return;
 use Log::Minimal qw//;
+use Types::Standard -types;
 
-=head1 CONSTRUCTOR AND STARTUP
+=head1 Construct and Start Singleton
 
 =head2 new
 
@@ -16,28 +17,22 @@ use Log::Minimal qw//;
 
 =cut
 
-sub new {
-    my ($class, %args) = @_;
-    my $self = bless {%args}, $class;
-    $self->_create_logger();
+method new($class:) :Return(InstanceOf['Oden::Logger']) {
+    my $self = $class->instance(@_);
+    $self->_create_logger;
     return $self;
 }
 
-{
-    no strict 'refs';
-    for my $method (qw/critf warnf infof  debugf critff warnff infoff debugff croakf croakff/){
-        *{__PACKAGE__ . '::' . $method} = sub {
-            my $self       = shift;
-            my $logger     = $self->{logger};
-            my $fullmethod = "Log::Minimal::$method";
-            my $res = $fullmethod->(@_);
-            $logger->print($res);
-        };
-    }
-}
+=head1 METHODS
 
-sub say {
-    my ($self, $message) = @_;
+=head2 say
+
+  logging message.
+  this method is ignore log level. always print message.
+
+=cut
+
+method say(Str $message) :Return(Str) {
     my $logger           = $self->{logger};
 
     my ( $sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst ) =
@@ -55,6 +50,43 @@ sub say {
     $logger->print($full_message);
 }
 
+=head2 critf
+
+  logging CRITICAL message and die.
+
+=head2 warnf
+
+  logging WARNING message and warn.
+
+=head2 infof
+
+  logging INFO message.
+  same as Log::Minimal::infof
+
+=cut
+
+method critf (Str $message) :Return() {
+    $self->{logger}->print(Log::Minimal::critf($message));
+    die $message;
+}
+method warnf (Str $message) :Return(Bool) {
+    $self->{logger}->print(Log::Minimal::warnf($message));
+    warn $message;
+    return 1;
+}
+method infof (Str $message) :Return(Bool) {
+    $self->{logger}->print(Log::Minimal::infof($message));
+    return 1;
+}
+
+=head1 PRIVATE METHODS
+
+=head2 _create_logger
+
+  create logger object.
+
+=cut
+
 sub _create_logger {
     my $self = shift;
 
@@ -68,9 +100,32 @@ sub _create_logger {
     };
 }
 
+=head1 OVERWRITE
+
+=head2 Log::Minimal::PRINT
+
+  overwrite Log::Minimal::PRINT variable.
+  this method is format log message.
+
+=cut
+
 $Log::Minimal::PRINT = sub {
     my ( $time, $type, $message, $trace) = @_;
     return sprintf("%s [%s] %s at %s\n", $time, $type, $message, $trace);
 };
 
-1;
+
+=head2 Log::Minimal::LOG_LEVEL
+
+  overwrite Log::Minimal::LOG_LEVEL variable.
+  this method is set log level.
+
+=cut
+
+$Log::Minimal::LOG_LEVEL = "INFO";
+
+=head1 SEE ALSO
+
+L<Log::Minimal>
+
+=cut
