@@ -23,6 +23,18 @@ class Oden::Entity::CommunicationReceiver {
     username => 'yournick',
   };
 
+=head1 CONSTRUCTOR AND STARTUP
+
+=head2 new
+
+  Creates and returns a new CommunicationReceiver object.
+
+  Required Args:
+    HashRef:
+      message  => Str
+      guild_id => Int
+      username => Str
+
 =head1 Accessor
 
 =over

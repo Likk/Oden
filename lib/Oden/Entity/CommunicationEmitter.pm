@@ -21,6 +21,12 @@ use Types::Standard -types;
   };
   $receiver->as_content;
 
+=head1 CONSTRUCTOR AND STARTUP
+
+=head2 new
+
+  Creates and returns a new CommunicationEmitter object.
+
 =head1 Accessor
 
 =over
