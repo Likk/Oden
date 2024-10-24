@@ -23,7 +23,7 @@ use Moops;
       token => $token,
   });
 
-=head1 Overwrite or additinal methods
+=head1 Overwrite or additional methods
 
 =head2 AnyEvent::Discord::update_status
 

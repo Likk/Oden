@@ -100,7 +100,7 @@ sub _create_logger {
     };
 }
 
-=head1 OVERWITE
+=head1 OVERWRITE
 
 =head2 Log::Minimal::PRINT
 
