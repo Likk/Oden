@@ -3,7 +3,6 @@ use warnings;
 use utf8;
 use Test::Exception;
 use Test::Spec;
-use Oden;
 use Oden::Logger;
 
 describe 'about Oden#logger' => sub {
