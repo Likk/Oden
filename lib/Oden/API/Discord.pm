@@ -1,11 +1,14 @@
 package Oden::API::Discord;
-use strict;
-use warnings;
+use 5.40.0;
+use feature qw/try/;
 
+use Function::Parameters;
+use Function::Return;
 use Furl;
 use HTTP::Request::Common;
 use JSON::XS    qw/decode_json encode_json/;
 use Time::HiRes qw/gettimeofday tv_interval/;
+use Types::Standard -types;
 use URI;
 
 =head1 NAME
@@ -24,16 +27,23 @@ use URI;
 
   Creates and returns a new chat bot object
 
+  Args:
+    # Required
+      token : Str
+    # Optional
+      base_url : Str # default: 'https://discordapp.com/api'
+      interval : Int # default: 1
+      last_req : ArrayRef # default: [epoch.msec]
+
 =cut
 
-sub new {
-    my ($class, %args) = @_;
-    my $self = bless {%args}, $class;
+method new($class: %args) :Return(InstanceOf[Oden::API::Discord]) {
+    my $self = bless +{ %args }, $class;
     die 'require token parameter.' unless $self->{token};
 
     $self->{base_url} ||= 'https://discordapp.com/api';
     $self->{last_req} ||= $self->last_request_time;
-    $self->{interval} ||= 1;
+    $self->{interval} //= 1;
     return $self;
 }
 
@@ -41,12 +51,11 @@ sub new {
 
 =head2 endpoint_config
 
-  create named endpoint list.
+  create named endpoint hash.
 
 =cut
 
-sub endpoint_config {
-    my ($self) = @_;
+method endpoint_config() :Return(HashRef) {
     return $self->{endpoint_list} ||= do {
             +{
                 show_message       => $self->{base_url} . "/channels/%s/messages/%s",
@@ -59,58 +68,85 @@ sub endpoint_config {
 
 =head2 show_user
 
-  show user detail
+  Returns a user object for a given user ID.
+
+  GET `/users/{user.id}`
+
+  Args:
+    user_id : Int
+
+  Returns:
+    HashRef
 
 =cut
 
-sub show_user {
-    my ($self, $user_id) = @_;
-
-    return $self->_request(
+method show_user(Int $user_id) :Return(Maybe[HashRef]) {
+    my $res = $self->_request(
         sprintf($self->endpoint_config->{show_user}, $user_id) => +{}
     );
+    return $res ? $res : undef;
 }
 
 =head2 show_channel
 
-  show channel detail
+  Get a channel by ID. Returns a channel object.
+  If the channel is a thread, a thread member object is included in the returned result.
+
+  GET `/channels/{channel.id}`
+
+  Args:
+    channel_id : Int
+
+  Returns:
+    HashRef
 
 =cut
 
-sub show_channel {
-    my ($self, $channel_id) = @_;
-
-    return $self->_request(
+method show_channel(Int $channel_id) :Return(Maybe[HashRef]) {
+    my $res = $self->_request(
         sprintf($self->endpoint_config->{show_channel}, $channel_id) => +{}
     );
+    return $res ? $res : undef;
 }
 
 =head2 list_guild_members
 
-  show guild members list.
+  Returns a list of guild member objects that are members of the guild.
+
+  GET `/guilds/{guild.id}/members`
+
+  Args:
+    guild_id : Int
+    option   : HashRef
+      limit : Int (1-1000)
+
+  Returns:
+    ArrayRef[HashRef]
 
 =cut
 
-sub list_guild_members {
-    my ($self, $guild_id, $option) = @_;
+method list_guild_members(Int $guild_id, HashRef $option = {}) :Return(Maybe[ArrayRef]) {
     $option->{limit} ||= 50;
-    return $self->_request(
+    my $res = $self->_request(
         sprintf($self->endpoint_config->{list_guild_members}, $guild_id) => $option
     );
+    return $res ? $res : undef;
 }
 
 =head2 show_message
 
-  show message detail
+  Retrieves a specific message in the channel. Returns a message object on success,
+
+  GET `/channels/{channel.id}/messages/{message.id}`
+
 
 =cut
 
-sub show_message {
-    my ($self, $channel_id, $message_id) = @_;
-
-    return $self->_request(
+method show_message(Int $channel_id, Int $message_id) :Return(Maybe[HashRef]) {
+    my $res = $self->_request(
         sprintf($self->endpoint_config->{show_message}, $channel_id, $message_id) => +{}
     );
+    return $res ? $res : undef;
 }
 
 =head2 send_message
@@ -119,8 +155,7 @@ sub show_message {
 
 =cut
 
-sub send_message {
-    my ($self, $channel_id, $content) = @_;
+method send_message(Int $channel_id, Str $content) :Return(Maybe[Bool]) {
 
     my $endpoint = $self->{base_url} . sprintf("/channels/%s/messages", $channel_id);
     my $req = POST(
@@ -135,10 +170,9 @@ sub send_message {
     unless($res->is_success()){
         warn $res->status;
         warn $res->message;
-        return ;
+        return undef;
     }
     return 1;
-
 }
 
 =head2 send_attached_file
@@ -147,9 +181,10 @@ sub send_message {
 
 =cut
 
-sub send_attached_file {
-    my ($self, $channel_id, $path, $filename) = @_;
-    $filename ||= $path;
+method send_attached_file(Int $channel_id, Str $path, @args)  :Return(Maybe[Bool]) {
+    # filename is optional, default is basename of path.
+    my ($filename) = @args;
+    $filename ||= [split('/', $path)]->[-1];
 
     my $endpoint = $self->{base_url} . sprintf("/channels/%s/messages", $channel_id);
     my $req = POST(
@@ -162,10 +197,12 @@ sub send_attached_file {
         ],
     );
 
+    $self->_sleep_interval;
     my $res = $self->_user_agent->request($req);
     unless($res->is_success()){
         warn $res->status_line;
-        return ;
+        warn $res->message;
+        return undef;
     }
     return 1;
 }
@@ -176,18 +213,13 @@ sub send_attached_file {
 
 =cut
 
-sub join_thread {
-    my ($self, $channel_id, ) = @_;
-
+method join_thread(Int $channel_id) :Return(Maybe[Bool]) {
     my $endpoint = sprintf("%s/channels/%s/thread-members/%s",
         $self->{base_url},
         $channel_id,
         '@me',
     );
 
-    $self->_sleep_interval;
-    my $url = URI->new($endpoint);
-    $url->query_form();
     my $req = HTTP::Request->new('PUT' => $endpoint,
         [
             Authorization => sprintf("Bot %s", $self->{token}),
@@ -195,13 +227,12 @@ sub join_thread {
         ],
     );
 
+    $self->_sleep_interval;
     my $res = $self->_user_agent->request($req);
-
-    my $data = {};
-
     unless($res->is_success()){
         warn $res->status_line;
-        return ;
+        warn $res->message;
+        return undef;
     }
 
     #returns no contents 204 responce
@@ -231,20 +262,18 @@ sub _request {
     );
 
     my $res = $self->_user_agent->request($req);
-
     my $data = {};
     unless($res->is_success()){
         warn $res->status;
         warn $res->message;
         return ;
     }
-    eval {
+    try {
         $data = decode_json($res->decoded_content());
-    };
-    if($@){
-        my $e = $@;
-        warn $e;
     }
+    catch($e){
+        warn $e;
+    };
     return $data;
 }
 
@@ -270,12 +299,13 @@ sub _user_agent {
 =cut
 
 sub _sleep_interval {
-  my $self = shift;
+    my $self = shift;
+    return 0 unless $self->{interval};
 
-  my $interval = tv_interval($self->last_request_time);
-  my $wait = $self->{interval} - $interval;
-  Time::HiRes::sleep($wait) if $wait > 0;
-  $self->{last_req} = [gettimeofday];
+    my $interval = tv_interval($self->last_request_time);
+    my $wait = $self->{interval} - $interval;
+    Time::HiRes::sleep($wait) if $wait > 0;
+    $self->{last_req} = [gettimeofday];
 }
 
 =head2 B<last_request_time>
