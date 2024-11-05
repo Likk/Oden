@@ -172,7 +172,7 @@ describe 'about Oden::API::Discord#show_message' => sub {
                             +{
                                 'content-type' => 'application/json'
                             },
-                            q|{"content":"test message","mentions":[],"mention_roles":[],"attachments":[],"embeds":[],"flags":0,"components":[],"id":"222","channel_id":"111","author":{"id":"333","username":"nick"}}|
+                            q|{"content":"test message","mentions":[],"mention_roles":[],"attachments":[],"embeds":[],"flags":0,"components":[],"id":"9999","channel_id":"999","author":{"id":"333","username":"nick"}}|
                         );
                     },
                 });
