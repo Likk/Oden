@@ -49,9 +49,8 @@ fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) :Return
 
         my $talk = '';
         my $group_num = 1;
-        for my $group (@$groups){
-            $talk .= sprintf("Group %d: %s\n", $group_num , join ', ', @$group);
-            $group_num++;
+        for my ($group_num, $group) (indexed @$groups){
+            $talk .= sprintf("Group %d: %s\n", $group_num + 1 , join ', ', @$group);
         }
         chomp $talk;
         $entity->message($talk);
