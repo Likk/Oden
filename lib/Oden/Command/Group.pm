@@ -5,7 +5,6 @@ use Function::Parameters;
 use Function::Return;
 use List::Util;
 use Oden::Entity::CommunicationEmitter;
-use Text::Trim;
 use Types::Standard -types;
 
 use constant {
@@ -36,8 +35,8 @@ fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) :Return
     my $entity = Oden::Entity::CommunicationEmitter->new;
 
     if($hear =~ m{^(?<number>\d+(?:\s+))?(?<names>.+)$}){
-        my $number =                 Text::Trim::trim($+{number} || 2);
-        my @names  = split /[\s,]+/, Text::Trim::trim($+{names}  || '');
+        my $number =                 trim($+{number} || 2);
+        my @names  = split /[\s,]+/, trim($+{names}  || '');
 
         return $entity unless $number;
         return $entity unless scalar @names;

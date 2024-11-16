@@ -11,7 +11,6 @@ requires 'Number::Format';
 requires 'String::Random';
 requires 'Text::CSV';
 requires 'Text::CSV_XS';
-requires 'Text::Trim';
 requires 'Time::Piece';
 requires 'URI::Escape';
 

@@ -7,7 +7,6 @@ use Function::Return;
 use Games::Dice qw/roll roll_array/;
 use List::Util  qw/sum/;
 use Oden::Entity::CommunicationEmitter;
-use Text::Trim;
 use Types::Standard -types;
 
 use constant {
@@ -77,7 +76,7 @@ our $PARSE_ROLL_PATTERN = qr{
 =cut
 
 fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) :Return(Maybe[Oden::Entity::CommunicationEmitter]) {
-    my $hear   = Text::Trim::trim($receiver->message || '');
+    my $hear   = trim($receiver->message || '');
     my $entity = Oden::Entity::CommunicationEmitter->new(
         username => $receiver->username,
     );
