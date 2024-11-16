@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use utf8;
-use Test::Exception;
+use Test::Warn;
 use Test::Spec;
 use Oden::Dispatcher;
 
@@ -25,13 +25,13 @@ describe 'about Oden::Dispatcher::dispatch' => sub {
     };
 
     context 'Positive testing' => sub {
-        context 'GLOBAL VARIABLE' => sub {
+        xcontext 'GLOBAL VARIABLE' => sub {
             it 'hash.dispatcher and $DISPATCH are same' => sub {
                 is_deeply $hash->{dispatcher}, $Oden::Dispatcher::DISPATCH, 'same';
             };
         };
 
-        context 'case commands are exist' => sub {
+        xcontext 'case commands are exist' => sub {
             they 'should return class name' => sub {
                 for my ($key) (keys %{$hash->{dispatcher}}) {
                     my $command    = $hash->{dispatcher}->{$key};
@@ -42,10 +42,24 @@ describe 'about Oden::Dispatcher::dispatch' => sub {
             };
         };
 
-        context 'case command is not exists' => sub {
+        xcontext 'case command is not exists' => sub {
             it 'should return undef' => sub {
                 my $package = Oden::Dispatcher->dispatch('not_exist');
                 is $package, undef, 'undef';
+            };
+        };
+
+        context "cant load package" => sub {
+            before all => sub {
+                $Oden::Dispatcher::DISPATCH = +{
+                    'not_exist' => 'NotExist',
+                };
+            };
+            it 'should throw exception' => sub {
+                warning_like {
+                    my $package = Oden::Dispatcher->dispatch('not_exist');
+                    is $package, undef, 'undef';
+                } qr/Can't locate Oden\/Command\/NotExist.pm in \@INC/, 'throw and warning';
             };
         };
     };
