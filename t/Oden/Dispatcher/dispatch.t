@@ -25,24 +25,23 @@ describe 'about Oden::Dispatcher::dispatch' => sub {
     };
 
     context 'Positive testing' => sub {
-        xcontext 'GLOBAL VARIABLE' => sub {
+        context 'GLOBAL VARIABLE' => sub {
             it 'hash.dispatcher and $DISPATCH are same' => sub {
                 is_deeply $hash->{dispatcher}, $Oden::Dispatcher::DISPATCH, 'same';
             };
         };
 
-        xcontext 'case commands are exist' => sub {
+        context 'case commands are exist' => sub {
             they 'should return class name' => sub {
-                for my ($key) (keys %{$hash->{dispatcher}}) {
-                    my $command    = $hash->{dispatcher}->{$key};
-                    my $class_name = "Oden::Command::$command";
+                for my ($key, $value) (%{$hash->{dispatcher}}) {
+                    my $class_name = "Oden::Command::$value";
                     my $package    = Oden::Dispatcher->dispatch($key);
                     is $package, $class_name, $key;
                 };
             };
         };
 
-        xcontext 'case command is not exists' => sub {
+        context 'case command is not exists' => sub {
             it 'should return undef' => sub {
                 my $package = Oden::Dispatcher->dispatch('not_exist');
                 is $package, undef, 'undef';
