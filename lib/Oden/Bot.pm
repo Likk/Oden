@@ -27,6 +27,11 @@ use constant {
   Odeb bot is a main logic of chat bot.
   # チャットボットのクライアントシステムに依存しないロジックを記述する
 
+=head1 SYNOPSIS
+
+  use Oden::Bot;
+  my $res = $bot->talk($content, $guild_id, $username);
+
 =head1 METHODS
 
 =head2 talk
