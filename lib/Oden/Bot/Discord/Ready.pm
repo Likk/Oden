@@ -57,11 +57,11 @@ fun ready(AnyEvent::Discord $client, HashRef $data, @args) :Return(Bool) {
                 type => 0,
             }],
         });
-        return 1;
+        return false;
     }
     catch ($e) {
         $logger->croakf('Failed to update status: %s', $e);
-        return 0;
+        return true;
     };
 }
 
