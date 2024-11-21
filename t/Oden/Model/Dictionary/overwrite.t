@@ -37,25 +37,25 @@ describe 'about Oden::Model::Dictionary#overwrite' => sub {
             };
         };
         context 'case no key' => sub {
-            it 'when return 0' => sub {
+            it 'when return false' => sub {
                 my $res =  $hash->{dictionary}->overwrite('' => 'bar');
-                is $res, 0, 'no key';
+                is $res, false, 'no key';
             };
         };
         context 'case no value' => sub {
-            it 'when return 0' => sub {
+            it 'when return false' => sub {
                 my $res = $hash->{dictionary}->overwrite('foo' => '');
-                is $res, 0, 'no value';
+                is $res, false, 'no value';
             };
         };
     };
 
     context 'Positive testing' => sub {
         context 'case doesnt exist key' => sub {
-           it 'when return 1' => sub {
+           it 'when return false' => sub {
                 my $dictionary = $hash->{dictionary};
                 my $res = $dictionary->overwrite('foo' => 'bar');
-                is $res, 0, 'cant overwrite';
+                is $res, false, 'cant overwrite';
             };
         };
 
@@ -66,7 +66,7 @@ describe 'about Oden::Model::Dictionary#overwrite' => sub {
             it 'when dont overwrite' => sub {
                 my $dictionary = $hash->{dictionary};
                 my $res = $dictionary->overwrite('foo' => 'bar2');
-                is $res, 1, 'overwrite correct';
+                is $res, true, 'overwrite correct';
             };
         };
     };
