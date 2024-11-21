@@ -1,5 +1,4 @@
-use strict;
-use warnings;
+use 5.40.0;
 use utf8;
 use Test::Spec;
 use Oden::Entity::CommunicationEmitter
@@ -20,7 +19,7 @@ describe 'about Oden::Entity::CommunicationEmitter#new' => sub {
             my $entity = $hash->{entity};
             isa_ok $entity,             'Oden::Entity::CommunicationEmitter', 'instance is Oden::Entity::CommunicationEmitter';
             is     $entity->as_content, '',                                    'message is ""';
-            is     $entity->is_empty,   1,                                     'is_empty is 1';
+            is     $entity->is_empty,   true,                                     'is_empty is true';
         };
     };
 
@@ -37,7 +36,7 @@ describe 'about Oden::Entity::CommunicationEmitter#new' => sub {
                 my $entity = $hash->{entity};
                 isa_ok $entity,                          'Oden::Entity::CommunicationEmitter', 'instance is Oden::Entity::CommunicationEmitter';
                 is     $entity->as_content,              'test message',                       'message is "test message"';
-                is     $entity->is_empty,                0,                                    'is_empty is 0';
+                is     $entity->is_empty,                false,                                    'is_empty is false';
             };
         };
 
