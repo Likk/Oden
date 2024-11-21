@@ -96,15 +96,15 @@ method create_tsv_file() :Return(Str){
 =cut
 
 method set(Str $key, Str $value) :Return(Bool){
-    return 0 unless $key;
-    return 0 unless $value;
+    return false unless $key;
+    return false unless $value;
 
     my $dictionary = $self->_dictionary;
-    return 0 if exists $dictionary->{$key};
+    return false if exists $dictionary->{$key};
 
     $dictionary->{$key} = $value;
     lock_nstore($dictionary, $self->_file());
-    return 1;
+    return true;
 }
 
 =head2 overwrite
@@ -114,15 +114,15 @@ method set(Str $key, Str $value) :Return(Bool){
 =cut
 
 method overwrite(Str $key, Str $value) :Return(Bool){
-    return 0 unless $key;
-    return 0 unless $value;
+    return false unless $key;
+    return false unless $value;
 
     my $dictionary = $self->_dictionary;
-    return 0 unless delete $dictionary->{$key};
+    return false unless delete $dictionary->{$key};
 
     $dictionary->{$key} = $value;
     lock_nstore($dictionary, $self->_file());
-    return 1;
+    return true;
 }
 
 =head2 remove
@@ -132,14 +132,14 @@ method overwrite(Str $key, Str $value) :Return(Bool){
 =cut
 
 method remove(Str $key) :Return(Bool){
-    return 0 unless $key;
+    return false unless $key;
 
     my $dictionary = $self->_dictionary;
     my $value = delete $dictionary->{$key};
-    return 0 unless $value;
+    return false unless $value;
 
     lock_nstore($dictionary, $self->_file());
-    return 1;
+    return true;
 }
 
 =head2 get
@@ -163,16 +163,16 @@ method get(Str $key) :Return(Maybe[Str]){
 =cut
 
 method move(Str $before, Str $after) :Return(Bool){
-    return 0 unless $before;
-    return 0 unless $after;
+    return false unless $before;
+    return false unless $after;
 
     my $dictionary = $self->_dictionary;
     my $value = delete $dictionary->{$before};
-    return 0 unless $value;
+    return false unless $value;
 
     $dictionary->{$after} = $value;
     lock_nstore($dictionary, $self->_file());
-    return 1;
+    return true;
 }
 
 =head1 PRIVATE METHODS

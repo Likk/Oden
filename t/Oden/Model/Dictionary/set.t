@@ -37,25 +37,25 @@ describe 'about Oden::Model::Dictionary#set' => sub {
             };
         };
         context 'case no key' => sub {
-            it 'when return 0' => sub {
+            it 'when return false' => sub {
                 my $res =  $hash->{dictionary}->set('' => 'bar');
-                is $res, 0, 'no key';
+                is $res, false, 'no key';
             };
         };
         context 'case no value' => sub {
-            it 'when return 0' => sub {
+            it 'when return false' => sub {
                 my $res = $hash->{dictionary}->set('foo' => '');
-                is $res, 0, 'no value';
+                is $res, false, 'no value';
             };
         };
     };
 
     context 'Positive testing' => sub {
         context 'case call set method' => sub {
-           it 'when return 1' => sub {
+           it 'when return true' => sub {
                 my $dictionary = $hash->{dictionary};
                 my $res = $dictionary->set('foo' => 'bar');
-                is $res, 1, 'set correct';
+                is $res, true, 'set correct';
             };
 
             it 'when write file' => sub {
@@ -68,7 +68,7 @@ describe 'about Oden::Model::Dictionary#set' => sub {
             it 'when dont overwrite' => sub {
                 my $dictionary = $hash->{dictionary};
                 my $res = $dictionary->set('foo' => 'bar2');
-                is $res, 0, 'already exists key';
+                is $res, false, 'already exists key';
             };
         };
     };

@@ -37,19 +37,19 @@ describe 'about Oden::Model::Dictionary#move' => sub {
             };
         };
         context 'case no key' => sub {
-            it 'when return 0' => sub {
+            it 'when return false' => sub {
                 my $res =  $hash->{dictionary}->move(foo => '');
-                is $res, 0, 'no key';
+                is $res, false, 'no key';
             };
         };
     };
 
     context 'Positive testing' => sub {
         context 'case doesnt exist key' => sub {
-           it 'when return 0' => sub {
+           it 'when return false' => sub {
                 my $dictionary = $hash->{dictionary};
                 my $res = $dictionary->move('foo' => 'hoge');
-                is $res, 0, 'cant move';
+                is $res, false, 'cant move';
             };
         };
 
@@ -61,7 +61,7 @@ describe 'about Oden::Model::Dictionary#move' => sub {
                 my $dictionary = $hash->{dictionary};
                 my $res = $dictionary->move('foo' => 'hoge');
 
-                is $res, 1, 'move correct';
+                is $res, true, 'move correct';
                 is $dictionary->get('hoge'), 'bar', 'move correct';
             };
         };

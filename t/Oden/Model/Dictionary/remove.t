@@ -37,19 +37,19 @@ describe 'about Oden::Model::Dictionary#remove' => sub {
             };
         };
         context 'case no key' => sub {
-            it 'when return 0' => sub {
+            it 'when return false' => sub {
                 my $res =  $hash->{dictionary}->remove('');
-                is $res, 0, 'no key';
+                is $res, false, 'no key';
             };
         };
     };
 
     context 'Positive testing' => sub {
         context 'case doesnt exist key' => sub {
-           it 'when return 0' => sub {
+           it 'when return false' => sub {
                 my $dictionary = $hash->{dictionary};
                 my $res = $dictionary->remove('foo');
-                is $res, 0, 'cant remove';
+                is $res, false, 'cant remove';
             };
         };
 
@@ -61,7 +61,7 @@ describe 'about Oden::Model::Dictionary#remove' => sub {
                 my $dictionary = $hash->{dictionary};
                 my $res = $dictionary->remove('foo');
 
-                is $res, 1, 'remove correct';
+                is $res, true, 'remove correct';
                 is $dictionary->get('foo'), undef, 'remove correct';
             };
         };

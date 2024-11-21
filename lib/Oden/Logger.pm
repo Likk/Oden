@@ -72,11 +72,11 @@ method critf (Str $message) :Return() {
 method warnf (Str $message) :Return(Bool) {
     $self->{logger}->print(Log::Minimal::warnf($message));
     warn $message;
-    return 1;
+    return true;
 }
 method infof (Str $message) :Return(Bool) {
     $self->{logger}->print(Log::Minimal::infof($message));
-    return 1;
+    return true;
 }
 
 =head1 PRIVATE METHODS

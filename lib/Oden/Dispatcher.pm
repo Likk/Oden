@@ -1,10 +1,10 @@
 package Oden::Dispatcher;
 use 5.40.0;
-use feature qw(try);
+use builtin qw(load_module);
+no warnings 'experimental::builtin';
 
 use Function::Parameters;
 use Function::Return;
-use Module::Load;
 use Types::Standard -types;
 
 =encoding utf8
@@ -63,7 +63,7 @@ fun dispatch(ClassName $class, Str $command) :Return(Maybe[ClassName]) {
     my $package = sprintf("Oden::Command::%s", $dispatched);
 
     try {
-        autoload($package);
+        load_module($package);
     }
     catch ($e) {
         warn $e;

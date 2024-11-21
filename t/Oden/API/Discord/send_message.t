@@ -1,5 +1,4 @@
-use strict;
-use warnings;
+use 5.40.0;
 use utf8;
 
 use Test::Spec;
@@ -48,13 +47,13 @@ describe 'about Oden::API::Discord#send_message' => sub {
 
             };
 
-            it 'when return undef and warnings' => sub {
+            it 'when return false and warnings' => sub {
                 warnings_like {
                     my $res = $hash->{api}->send_message(
                         $hash->{valid_channel_id},
                         $hash->{content}
                     );
-                    is $res, undef;
+                    is $res, false;
                 } [qr/401/, qr/Unauthorized/];
             };
         };
@@ -82,13 +81,13 @@ describe 'about Oden::API::Discord#send_message' => sub {
                 delete $hash->{api};
                 delete $hash->{stubs}->{furl};
             };
-            it 'when return undef and warnings' => sub {
+            it 'when return false and warnings' => sub {
                 warnings_like {
                     my $res = $hash->{api}->send_message(
                         $hash->{unknown_channel_id},
                         $hash->{content}
                     );
-                    is $res, undef;
+                    is $res, false;
                 } [qr/404/, qr/Not Found/];
             };
         };
@@ -116,13 +115,13 @@ describe 'about Oden::API::Discord#send_message' => sub {
                 delete $hash->{api};
                 delete $hash->{stubs}->{furl};
             };
-            it 'when return undef and warnings' => sub {
+            it 'when return false and warnings' => sub {
                 warnings_like {
                     my $res = $hash->{api}->send_message(
                         $hash->{invalid_channel_id},
                         $hash->{content}
                     );
-                    is $res, undef;
+                    is $res, false;
                 } [qr/403/, qr/Forbidden/];
             };
         };

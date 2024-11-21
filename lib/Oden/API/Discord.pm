@@ -170,9 +170,9 @@ method send_message(Int $channel_id, Str $content) :Return(Maybe[Bool]) {
     unless($res->is_success()){
         warn $res->status;
         warn $res->message;
-        return undef;
+        return false;
     }
-    return 1;
+    return true;
 }
 
 =head2 send_attached_file
@@ -202,9 +202,9 @@ method send_attached_file(Int $channel_id, Str $path, @args)  :Return(Maybe[Bool
     unless($res->is_success()){
         warn $res->status_line;
         warn $res->message;
-        return undef;
+        return false;
     }
-    return 1;
+    return true;
 }
 
 =head2 join_thread
@@ -232,11 +232,11 @@ method join_thread(Int $channel_id) :Return(Maybe[Bool]) {
     unless($res->is_success()){
         warn $res->status_line;
         warn $res->message;
-        return undef;
+        return false;
     }
 
     #returns no contents 204 responce
-    return 1;
+    return true;
 }
 
 
