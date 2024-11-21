@@ -63,6 +63,8 @@ our $INGREDIENTS = [qw/
     餅巾着
 /];
 
+=back
+
 =head1 CONSTRUCTOR AND STARTUP
 
 =head2 new
