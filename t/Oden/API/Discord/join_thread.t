@@ -1,5 +1,4 @@
-use strict;
-use warnings;
+use 5.40.0;
 use utf8;
 
 use Test::Spec;
@@ -47,12 +46,12 @@ describe 'about Oden::API::Discord#join_thread' => sub {
 
             };
 
-            it 'when return undef and warnings' => sub {
+            it 'when return false and warnings' => sub {
                 warnings_like {
                     my $res = $hash->{api}->join_thread(
                         $hash->{valid_channel_id},
                     );
-                    is $res, undef;
+                    is $res, false;
                 } [qr/401/, qr/Unauthorized/];
             };
         };
@@ -80,12 +79,12 @@ describe 'about Oden::API::Discord#join_thread' => sub {
                 delete $hash->{api};
                 delete $hash->{stubs}->{furl};
             };
-            it 'when return undef and warnings' => sub {
+            it 'when return false and warnings' => sub {
                 warnings_like {
                     my $res = $hash->{api}->join_thread(
                         $hash->{unknown_thread_id},
                     );
-                    is $res, undef;
+                    is $res, false;
                 } [qr/404/, qr/Not Found/];
             };
         };
@@ -113,12 +112,12 @@ describe 'about Oden::API::Discord#join_thread' => sub {
                 delete $hash->{api};
                 delete $hash->{stubs}->{furl};
             };
-            it 'when return undef and warnings' => sub {
+            it 'when return false and warnings' => sub {
                 warnings_like {
                     my $res = $hash->{api}->join_thread(
                         $hash->{invalid_thread_id},
                     );
-                    is $res, undef;
+                    is $res, false;
                 } [qr/403/, qr/Forbidden/];
             };
         };
