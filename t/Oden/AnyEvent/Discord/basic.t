@@ -1,25 +1,26 @@
-use strict;
-use warnings;
-use utf8;
-use Test::Exception;
-use Test::Spec;
+use 5.40.0;
+use Test2::Bundle::Extended;
+use Test2::Tools::Spec;
+
 use Oden::AnyEvent::Discord;
 
 describe 'about Oden::AnyEvent::Discord' => sub {
-    my $hash;
-    share %$hash;
+    my $hash = {};
 
-    context 'when using Oden::AnyEvent::Discord' => sub {
-        before all => sub {
+    describe 'when using Oden::AnyEvent::Discord' => sub {
+        before_all setup => sub {
+
             $hash->{discord} = AnyEvent::Discord->new;
-
-            $hash->{stubs}   = AnyEvent::Discord->stubs(
-                token            => sub { return 'your token'; },
-                user_agent       => sub { return 'Perl-AnyEventDiscord/' . shift->VERSION },
-                _ws_send_payload => sub { return $_[1]; },
-                _debug           => sub {  },
-                _discord_api     => sub { +{ url => "wss://gateway.discord.gg/" } },
+            my $mock = mock "AnyEvent::Discord" => (
+                add => [
+                    token            => sub { return 'your token'; },
+                    user_agent       => sub { return 'Perl-AnyEventDiscord/' . shift->VERSION },
+                    _ws_send_payload => sub { return $_[1]; },
+                    _debug           => sub {  },
+                    _discord_api     => sub { +{ url => "wss://gateway.discord.gg.example/" } }
+                ],
             );
+            $hash->{mock} = $mock;
         };
 
         it 'add update_status method at AnyEvent::Discord' => sub {
@@ -42,9 +43,9 @@ describe 'about Oden::AnyEvent::Discord' => sub {
 
         it 'patched _lookup_gateway method at AnyEvent::Discord' => sub {
             my $gateway = $hash->{discord}->_lookup_gateway();
-            is $gateway, 'wss://gateway.discord.gg/?v=9&encoding=json'
+            is $gateway, 'wss://gateway.discord.gg.example/?v=9&encoding=json'
         };
     };
 };
 
-runtests;
+done_testing();
