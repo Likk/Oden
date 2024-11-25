@@ -41,9 +41,18 @@ describe 'about Oden::API::LodestoneNews#list' => sub {
     context "Negative testing" => sub {
         context "HTTP::Request resopnse is not 200" => sub {
             before all => sub {
-                $hash->{stubs}->{furlResponse} = Furl::Response->stubs(+{
-                    is_success => sub { return 0 },
-                    message    => sub { return '503 Service Unavailable' },
+                $hash->{stubs}->{FurlRequest} = Furl->stubs(+{
+                    request => sub {
+                        Furl::Response->new(
+                            503,
+                            '503 Service Unavailable',
+                            "Service Unavailable",
+                            +{
+                                'content-type' => 'application/json'
+                            },
+                            q|{"message": "503 Service Unavailable", "code": 0}|
+                        );
+                    },
                 });
             };
 
@@ -61,8 +70,18 @@ describe 'about Oden::API::LodestoneNews#list' => sub {
 
         context "HTTP::Request resopnse is not JSON" => sub {
             before all => sub {
-                $hash->{stubs}->{furlResponse} = Furl::Response->stubs(+{
-                    content    => sub { return 'not json' }
+                $hash->{stubs}->{FurlRequest} = Furl->stubs(+{
+                    request => sub {
+                        Furl::Response->new(
+                            200,
+                            '200 OK',
+                            "OK",
+                            +{
+                                'content-type' => 'application/json'
+                            },
+                            q|not json|
+                        );
+                    },
                 });
             };
 
