@@ -1,18 +1,19 @@
-use strict;
-use warnings;
-use utf8;
-use Test::Exception;
-use Test::Spec;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
+
 use Oden::Logger;
+
 
 describe 'about Oden::Logger#say' => sub {
     my $hash;
-    share %$hash;
 
-    context 'when call method' => sub {
-        before all => sub {
-            $hash->{stubs}  = File::RotateLogs->stubs(
-                print => sub { $hash->{log} = $_[1]; }
+    describe 'when call method' => sub {
+        before_all "setup" => sub {
+            $hash->{mocks}  = mock "File::RotateLogs" => (
+                override => [
+                    print => sub { $hash->{log} = $_[1]; }
+                ],
             );
 
             Oden::Logger->new->say('say message');
@@ -24,4 +25,4 @@ describe 'about Oden::Logger#say' => sub {
     };
 };
 
-runtests;
+done_testing();

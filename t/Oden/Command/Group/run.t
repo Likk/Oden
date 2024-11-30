@@ -1,48 +1,52 @@
-use strict;
-use warnings;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
 
-use Test::Exception;
-use Test::Spec;
 use Oden::Entity::CommunicationReceiver;
 use Oden::Command::Group;
 use String::Random;
 
 describe 'about Oden::Command::Group#run' => sub {
     my $hash;
-    share %$hash;
 
     # Negative testing
-    context 'Negative testing' => sub {
-        context 'case call run method without arguments' => sub {
+    describe 'Negative testing' => sub {
+        describe 'case call run method without arguments' => sub {
             it 'when throws exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     Oden::Command::Group->run();
-                } qr/Too few arguments for fun run/;
+                };
+
+                like $throws, qr/Too few arguments for fun run/;
             };
         };
-        context 'case call run method with not expectd class' => sub {
+        describe 'case call run method with not expectd class' => sub {
             it 'when throws exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     my $random_class = bless {}, sprintf('Oden::Entity::%s', String::Random->new->randregex("[A-Za-z]{3,10}"));
                     Oden::Command::Group->run($random_class);
-                } qr/did not pass type constraint/;
+                };
+
+                like $throws, qr/did not pass type constraint/;
             };
         };
     };
 
     # Positive testing
-    context 'Positive testing' => sub {
-        context 'case call run method with Oden::Entity::CommunicationReceiver class' => sub {
-            before all => sub {
-                $hash->{make_groups_stub} = Oden::Command::Group->stubs(
-                    make_groups => sub {
-                        return [
-                            [qw/foo bar/],
-                        ];
-                    },
+    describe 'Positive testing' => sub {
+        describe 'case call run method with Oden::Entity::CommunicationReceiver class' => sub {
+            before_all "mockup Oden::Command::Group" => sub {
+                $hash->{make_groups_mock} = mock "Oden::Command::Group" => (
+                    override => [
+                        make_groups => sub {
+                            return [
+                                [qw/foo bar/],
+                            ];
+                        },
+                    ],
                 );
             };
-            context 'case call run method with Oden::Entity::CommunicationReceiver class without message' => sub {
+            describe 'case call run method with Oden::Entity::CommunicationReceiver class without message' => sub {
                 it 'when returns empty Oden::Entity::CommunicationEmitter' => sub {
                     my $receiver = Oden::Entity::CommunicationReceiver->new(
                         message  => '',
@@ -50,12 +54,12 @@ describe 'about Oden::Command::Group#run' => sub {
                         username => 'foo',
                     );
                     my $res = Oden::Command::Group->run($receiver);
-                    isa_ok $res,           'Oden::Entity::CommunicationEmitter';
+                    isa_ok $res,           ['Oden::Entity::CommunicationEmitter'];
                     is     $res->is_empty, 1;
                 };
             };
-            context 'case call run method with Oden::Entity::CommunicationReceiver class with message' => sub {
-                context 'message is space only' => sub {
+            describe 'case call run method with Oden::Entity::CommunicationReceiver class with message' => sub {
+                describe 'message is space only' => sub {
                     it 'when returns empty Oden::Entity::CommunicationEmitter' => sub {
                         my $receiver = Oden::Entity::CommunicationReceiver->new(
                             message  => '      ',
@@ -63,11 +67,11 @@ describe 'about Oden::Command::Group#run' => sub {
                             username => 'foo',
                         );
                         my $res = Oden::Command::Group->run($receiver);
-                        isa_ok $res,           'Oden::Entity::CommunicationEmitter';
+                        isa_ok $res,           ['Oden::Entity::CommunicationEmitter'];
                         is     $res->is_empty, 1;
                     };
                 };
-                context 'message is member names only' => sub {
+                describe 'message is member names only' => sub {
                     it 'when returns Oden::Entity::CommunicationEmitter and that has message' => sub {
                         my $receiver = Oden::Entity::CommunicationReceiver->new(
                             message  => 'foo bar baz',
@@ -75,11 +79,11 @@ describe 'about Oden::Command::Group#run' => sub {
                             username => 'foo',
                         );
                         my $res = Oden::Command::Group->run($receiver);
-                        isa_ok $res,          'Oden::Entity::CommunicationEmitter';
+                        isa_ok $res,          ['Oden::Entity::CommunicationEmitter'];
                         like   $res->message, qr/Group 1/;
                     };
                 };
-                context 'message is group number and member names' => sub {
+                describe 'message is group number and member names' => sub {
                     it 'when returns Oden::Entity::CommunicationEmitter and that has message' => sub {
                         # 2 <= number <= 5
                         my $number = int(rand(4)) + 2;
@@ -100,4 +104,4 @@ describe 'about Oden::Command::Group#run' => sub {
     };
 };
 
-runtests();
+done_testing();

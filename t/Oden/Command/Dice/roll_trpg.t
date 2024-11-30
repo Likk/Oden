@@ -1,48 +1,54 @@
-use strict;
-use warnings;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
 
-use Test::Exception;
-use Test::Spec;
 use Oden::Command::Dice;
 use String::Random;
 
 describe 'about Oden::Command::Dice#roll_trpg' => sub {
     my $hash;
-    share %$hash;
 
-    context 'Negative testing' => sub {
-        context 'case call roll_trpg method without arguments' => sub {
+    describe 'Negative testing' => sub {
+        describe 'case call roll_trpg method without arguments' => sub {
             it 'when throws exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     Oden::Command::Dice::roll_trpg();
-                } qr/Too few arguments for fun roll_trpg/;
+                };
+
+                like $throws, qr/Too few arguments for fun roll_trpg/;
             };
             it 'when throws exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     Oden::Command::Dice->roll_trpg();
-                } qr/Too few arguments for fun roll_trpg/;
+                };
+
+                like $throws, qr/Too few arguments for fun roll_trpg/;
             };
         };
-        context 'case call roll_trpg method with not expected arguments' => sub {
+        describe 'case call roll_trpg method with not expected arguments' => sub {
             it 'when throws exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     Oden::Command::Dice->roll_trpg(undef);
-                } qr/did not pass type constraint/;
+                };
+
+                like $throws, qr/did not pass type constraint/;
             };
             it 'when throws exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     my $random_class = bless {}, sprintf('Oden::Entity::%s', String::Random->new->randregex("[A-Za-z]{3,10}"));
                     Oden::Command::Dice->roll_trpg($random_class);
-                } qr/did not pass type constraint/;
+                };
+
+                like $throws, qr/did not pass type constraint/;
             };
 
         };
     };
 
-    context 'Positive testing' => sub {
-        context 'case call roll_trpg method with 2 hashes arguments' => sub {
-            context 'case dont match tpgs like roll pattern' => sub {
-                they 'when return empty string' => sub {
+    describe 'Positive testing' => sub {
+        describe 'case call roll_trpg method with 2 hashes arguments' => sub {
+            describe 'case dont match tpgs like roll pattern' => sub {
+                tests 'when return empty string' => sub {
                     my $roll_string_list = [
                         '',      # dont match empty pattern
                         '2A6',   # dont match "Dice" pattern
@@ -57,9 +63,9 @@ describe 'about Oden::Command::Dice#roll_trpg' => sub {
                     };
                 };
             };
-            context 'case match tpgs like and single dice roll pattern' => sub {
-                context 'case digit dice' => sub {
-                    they 'when return digit value' => sub {
+            describe 'case match tpgs like and single dice roll pattern' => sub {
+                describe 'case digit dice' => sub {
+                    tests 'when return digit value' => sub {
                         my $roll_string_list = [
                             '1d6',   # match "Dice" pattern
                             '1D6',
@@ -84,8 +90,8 @@ describe 'about Oden::Command::Dice#roll_trpg' => sub {
                         };
                     };
                 };
-                context 'case fudge dice' => sub {
-                    they 'when return digit value' => sub {
+                describe 'case fudge dice' => sub {
+                    tests 'when return digit value' => sub {
                         my $roll_string_list = [
                             '1dF',   # match "Dice" pattern
                             '1dF+1', # match sign pattern
@@ -103,9 +109,9 @@ describe 'about Oden::Command::Dice#roll_trpg' => sub {
                     };
                 };
             };
-            context 'case match tpgs like and multiple dice roll pattern' => sub {
-                context 'case digit dice' => sub {
-                    they 'when return digit value' => sub {
+            describe 'case match tpgs like and multiple dice roll pattern' => sub {
+                describe 'case digit dice' => sub {
+                    tests 'when return digit value' => sub {
                         my $roll_string_list = [
                             '3d10',   # match "Dice" pattern
                             '3d10',
@@ -141,8 +147,8 @@ describe 'about Oden::Command::Dice#roll_trpg' => sub {
                         };
                     };
                 };
-                context 'case fudge dice' => sub {
-                    they 'when return digit value' => sub {
+                describe 'case fudge dice' => sub {
+                    tests 'when return digit value' => sub {
                         my $roll_string_list = [
                             '3dF',   # match "Dice" pattern
                             '3dF+2', # match sign pattern
@@ -162,33 +168,37 @@ describe 'about Oden::Command::Dice#roll_trpg' => sub {
                     };
                 };
             };
-            context 'case CRITICAL!!' => sub {
-                before all => sub {
+            describe 'case CRITICAL!!' => sub {
+                before_all "mock roll result" => sub {
                     #Games::Dice::roll_array export to Oden::Command::Dice::roll_array
-                    $hash->{stub}->{GamesDiceRollArray} = Oden::Command::Dice->stubs(
-                        roll_array => sub {
-                            return (6, 6, 6);
-                        },
+                    $hash->{mocks}->{GamesDiceRollArray} = mock "Oden::Command::Dice" => (
+                        override => [
+                            roll_array => sub :prototype($) {
+                                return (6, 6, 6);
+                            },
+                        ],
                     );
                 };
-                after all => sub {
-                    delete $hash->{stub}->{GamesDiceRollArray};
+                after_all "mock roll result"=> sub {
+                    delete $hash->{mocks}->{GamesDiceRollArray};
                 };
                 it 'when return CRITICAL!!' => sub {
                     my $res = Oden::Command::Dice->roll_trpg('3d6');
                     is $res, 'CRITICAL!! total:18 (6 6 6)', 'return CRITICAL!!';
                 };
             };
-            context 'case FUMBLE!!' => sub {
-                before all => sub {
-                    $hash->{stub}->{GamesDiceRollArray} = Oden::Command::Dice->stubs(
-                        roll_array => sub {
-                            return (1, 1, 1);
-                        },
+            describe 'case FUMBLE!!' => sub {
+                before_all "mock roll result" => sub {
+                    $hash->{mocks}->{GamesDiceRollArray} = mock "Oden::Command::Dice" => (
+                        override => [
+                            roll_array => sub :prototype($) {
+                                return (1, 1, 1);
+                            },
+                        ],
                     );
                 };
-                after all => sub {
-                    delete $hash->{stub}->{GamesDiceRollArray};
+                after_all "mock roll result" => sub {
+                    delete $hash->{mocks}->{GamesDiceRollArray};
                 };
                 it 'when return FUMBLE!!' => sub {
                     my $res = Oden::Command::Dice->roll_trpg('3d6');
@@ -199,4 +209,4 @@ describe 'about Oden::Command::Dice#roll_trpg' => sub {
     };
 };
 
-runtests();
+done_testing();

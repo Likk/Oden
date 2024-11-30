@@ -1,19 +1,16 @@
-use strict;
-use warnings;
-
-use Test::Exception;
-use Test::Spec;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use Oden::Entity::CommunicationReceiver;
 use Oden::Command::Dice;
 
 describe 'about Oden::Command::Dice#run' => sub {
     my $hash;
-    share %$hash;
 
-    context 'Negative testing' => sub {
-        context 'case no parametor' => sub {
-            before all => sub {
+    describe 'Negative testing' => sub {
+        describe 'case no parametor' => sub {
+            before_all "setup CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => '',
                     guild_id => 1,
@@ -23,16 +20,18 @@ describe 'about Oden::Command::Dice#run' => sub {
             };
 
             it 'when throws exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     Oden::Command::Dice->run();
-                } qr/Too few arguments for fun run/;
+                };
+
+                like $throws, qr/Too few arguments for fun run/;
             };
         };
     };
 
-    context 'Positive testing' => sub {
-        context 'case message is ""' => sub {
-            before all => sub {
+    describe 'Positive testing' => sub {
+        describe 'case message is ""' => sub {
+            before_all "setup CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => '',
                     guild_id => 1,
@@ -51,4 +50,4 @@ describe 'about Oden::Command::Dice#run' => sub {
 
 };
 
-runtests();
+done_testing();

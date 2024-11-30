@@ -1,19 +1,16 @@
-use strict;
-use warnings;
-
-use Test::Exception;
-use Test::Spec;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use Oden::Entity::CommunicationReceiver;
 use Oden::Command::Choice;
 
 describe 'about Oden::Command::Choice#run' => sub {
     my $hash;
-    share %$hash;
 
-    context 'Negative testing' => sub {
-        context 'case no parametor' => sub {
-            before all => sub {
+    describe 'Negative testing' => sub {
+        describe 'case no parametor' => sub {
+            before_all "setup CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => '',
                     guild_id => 1,
@@ -23,16 +20,18 @@ describe 'about Oden::Command::Choice#run' => sub {
             };
 
             it 'when throws exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     Oden::Command::Choice->run();
-                } qr/Too few arguments for fun run/;
+                };
+
+                like $throws, qr/Too few arguments for fun run/;
             };
         };
     };
 
-    context 'Positive testing' => sub {
-        context 'case message is ""' => sub {
-            before all => sub {
+    describe 'Positive testing' => sub {
+        describe 'case message is ""' => sub {
+            before_all "setup CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => '',
                     guild_id => 1,
@@ -46,8 +45,8 @@ describe 'about Oden::Command::Choice#run' => sub {
                 is $entity->is_empty, 1;
             };
         };
-        context 'case message is "a b c"' => sub {
-            before all => sub {
+        describe 'case message is "a b c"' => sub {
+            before_all "setup CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => 'a b c',
                     guild_id => 1,
@@ -56,7 +55,7 @@ describe 'about Oden::Command::Choice#run' => sub {
                 $hash->{receiver} = $receiver;
             };
 
-            they 'when returns entity' => sub {
+            tests 'when returns entity' => sub {
                 for(1..10){
                     my $entity  = Oden::Command::Choice->run($hash->{receiver});
                     my $content = $entity->as_content;
@@ -68,4 +67,4 @@ describe 'about Oden::Command::Choice#run' => sub {
 
 };
 
-runtests();
+done_testing();

@@ -1,7 +1,7 @@
-use strict;
-use warnings;
-
-use Test::Spec;
+use 5.40.0;
+use autodie;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use File::Temp qw/tempdir/;
 use Oden::Entity::CommunicationReceiver;
@@ -11,12 +11,11 @@ local $ENV{DICT_DIR} = tempdir( CLEANUP => 1 );
 
 describe 'about Oden::Command::Dictionary#run' => sub {
     my $hash;
-    share %$hash;
 
-    context 'message prefix `overwrite`' => sub {
+    describe 'message prefix `overwrite`' => sub {
         # Negative testing
-        context 'case message pattern is `overwrite` only. no key, no value' => sub {
-            before all => sub {
+        describe 'case message pattern is `overwrite` only. no key, no value' => sub {
+            before_all "setup Oden::Entity::CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => 'overwrite',
                     guild_id => 1,
@@ -31,8 +30,8 @@ describe 'about Oden::Command::Dictionary#run' => sub {
             };
         };
 
-        context 'case message pattern is `overwrite <key>` only. no value' => sub {
-            before all => sub {
+        describe 'case message pattern is `overwrite <key>` only. no value' => sub {
+            before_all "setup Oden::Entity::CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => 'overwrite foo',
                     guild_id => 1,
@@ -48,8 +47,8 @@ describe 'about Oden::Command::Dictionary#run' => sub {
         };
 
         # Positive testing
-        context 'case message pattern is `overwrite <key> <value>`' => sub {
-            before all => sub {
+        describe 'case message pattern is `overwrite <key> <value>`' => sub {
+            before_all "setup Oden::Entity::CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => 'overwrite foo bar',
                     guild_id => 1,
@@ -58,35 +57,42 @@ describe 'about Oden::Command::Dictionary#run' => sub {
                 $hash->{receiver} = $receiver;
 
             };
-            context 'case success' => sub {
-                before all => sub {
-                    $hash->{mock}->{dict} = Oden::Model::Dictionary->stubs('overwrite', sub {
-                        return 1;
-                    });
+            describe 'case success' => sub {
+                before_all "mockup Oden::Model::Dictionary" => sub {
+                    $hash->{mock}->{dict} = mock "Oden::Model::Dictionary" => (
+                        override => [
+                            overwrite => sub {
+                                return 1;
+                            },
+                        ],
+                    );
                 };
 
                 it 'when returns undef' => sub {
                     my $entity = Oden::Command::Dictionary->run($hash->{receiver});
-                    isa_ok $entity, 'Oden::Entity::CommunicationEmitter', 'instance is Oden::Entity::CommunicationEmitter';
-                    is     $entity->as_content, 'overwrote', 'overwrite key and value';
+                    isa_ok $entity,             ['Oden::Entity::CommunicationEmitter'], 'instance is Oden::Entity::CommunicationEmitter';
+                    is     $entity->as_content, 'overwrote',                            'overwrite key and value';
                 };
             };
-            context 'case failure' => sub {
-                before all => sub {
-                    $hash->{mock}->{dict} = Oden::Model::Dictionary->stubs('overwrite', sub {
-                        return 0;
-                    });
+            describe 'case failure' => sub {
+                before_all "mockup Oden::Model::Dictionary" => sub {
+                    $hash->{mock}->{dict} = mock "Oden::Model::Dictionary" => (
+                        override => [
+                            overwrite => sub {
+                                return 0;
+                            },
+                        ],
+                    );
                 };
 
                 it 'when returns undef' => sub {
                     my $entity = Oden::Command::Dictionary->run($hash->{receiver});
-                    isa_ok $entity, 'Oden::Entity::CommunicationEmitter', 'instance is Oden::Entity::CommunicationEmitter';
-                    is     $entity->as_content, 'not registrated', 'failed to overwrite key and value';
+                    isa_ok $entity,             ['Oden::Entity::CommunicationEmitter'], 'instance is Oden::Entity::CommunicationEmitter';
+                    is     $entity->as_content, 'not registrated',                      'failed to overwrite key and value';
                 };
             };
         };
     };
-
 };
 
-runtests();
+done_testing();

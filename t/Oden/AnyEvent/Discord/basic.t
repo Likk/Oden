@@ -1,5 +1,5 @@
 use 5.40.0;
-use Test2::Bundle::Extended;
+use Test2::V0;
 use Test2::Tools::Spec;
 
 use Oden::AnyEvent::Discord;

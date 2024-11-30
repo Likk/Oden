@@ -1,8 +1,7 @@
 use 5.40.0;
 use autodie;
-
-use Test::Spec;
-use Test::Exception;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use Oden::Model::Dictionary;
 
@@ -10,9 +9,8 @@ local $ENV{DICT_DIR} = './t/Oden/Model/Dictionary/data/';
 
 describe 'about Oden::Model::Dictionary#get' => sub {
     my $hash;
-    share %$hash;
 
-    before all => sub {
+    before_all "setup" => sub {
         $hash->{file} = 'get.dat';
          my $dictionary = Oden::Model::Dictionary->new(+{
               file_name => $hash->{file},
@@ -20,15 +18,16 @@ describe 'about Oden::Model::Dictionary#get' => sub {
         $hash->{dictionary} = $dictionary;
     };
 
-    context 'Negative testing' => sub {
-        context 'case no parameter' => sub {
+    describe 'Negative testing' => sub {
+        describe 'case no parameter' => sub {
             it 'when no parameter' => sub {
-                throws_ok {
+                my $throws = dies {
                     $hash->{dictionary}->get();
-                } qr/Too few arguments for method get/, 'no parameter';
+                };
+                like $throws, qr/Too few arguments for method get/, 'no parameter';
             };
         };
-        context 'case no key' => sub {
+        describe 'case no key' => sub {
             it 'when return undef' => sub {
                 my $res =  $hash->{dictionary}->get('');
                 is $res, undef, 'no key';
@@ -36,8 +35,8 @@ describe 'about Oden::Model::Dictionary#get' => sub {
         };
     };
 
-    context 'Positive testing' => sub {
-        context 'case call get that doesnt exist' => sub {
+    describe 'Positive testing' => sub {
+        describe 'case call get that doesnt exist' => sub {
 
             it 'when get undef' => sub {
                 my $dictionary = $hash->{dictionary};
@@ -47,7 +46,7 @@ describe 'about Oden::Model::Dictionary#get' => sub {
             };
         };
 
-        context 'case call get that exist' => sub {
+        describe 'case call get that exist' => sub {
 
             it 'when get value' => sub {
                 my $dictionary = $hash->{dictionary};
@@ -59,4 +58,4 @@ describe 'about Oden::Model::Dictionary#get' => sub {
     };
 };
 
-runtests();
+done_testing();
