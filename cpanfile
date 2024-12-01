@@ -41,9 +41,6 @@ on 'test' => sub {
     requires 'App::ForkProve';
     # ./t layer
     requires 'Sub::Meta';
-    requires 'Test::Exception';
-    requires 'Test::Spec';
-    requires 'Test::Warn';
     # ./xt layer
     requires 'Test::More';
     requires 'Test::Perl::Critic';

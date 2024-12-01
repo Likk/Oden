@@ -2,7 +2,6 @@ use 5.40.0;
 use autodie;
 use Test2::V0;
 use Test2::Tools::Spec;
-use Test2::Tools::Explain;
 use Oden::Model::Dictionary;
 use Storable qw/retrieve/;
 
