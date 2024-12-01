@@ -1,40 +1,44 @@
-use strict;
-use warnings;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
 
-use Test::Exception;
-use Test::Spec;
 use Oden::Command::MarketBoard;
 use String::Random;
 
 describe 'about Oden::Command::MarketBoard#parse_message' => sub {
     my $hash;
-    share %$hash;
 
-    context 'Negative testing' => sub {
-        context 'case call parse_message method without arguments' => sub {
+    describe 'Negative testing' => sub {
+        describe 'case call parse_message method without arguments' => sub {
             it 'when throws exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     my @res = Oden::Command::MarketBoard::parse_message();
-                } qr/Too few arguments for fun parse_message/;
+                };
+
+                like $throws, qr/Too few arguments for fun parse_message/;
             };
             it 'when throws exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     my @res = Oden::Command::MarketBoard->parse_message();
-                } qr/Too few arguments for fun parse_message/;
+                };
+
+                like $throws, qr/Too few arguments for fun parse_message/;
             };
         };
-        context 'case call parse_message method with not expected arguments' => sub {
+        describe 'case call parse_message method with not expected arguments' => sub {
             it 'when throws exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     my @res = Oden::Command::MarketBoard->parse_message(undef);
-                } qr/did not pass type constraint/;
+                };
+
+                like $throws, qr/did not pass type constraint/;
             };
         };
     };
 
-    context 'Positive testing' => sub {
-        context 'case dont match pattern' => sub {
-            they 'when return empty array_ref' => sub {
+    describe 'Positive testing' => sub {
+        describe 'case dont match pattern' => sub {
+            tests 'when return empty array_ref' => sub {
                 my $string_list = [
                     '',            # dont match empty pattern
                     'zeromus',     # target only pattern
@@ -47,8 +51,8 @@ describe 'about Oden::Command::MarketBoard#parse_message' => sub {
                 };
             };
         };
-        context 'case match pattern' => sub {
-            they 'when return array ref' => sub {
+        describe 'case match pattern' => sub {
+            tests 'when return array ref' => sub {
                 my $string_list = [
                     'zeromus Lalafellin Kaftan',    # match world and item name pattern
                     'zeromus HQ Lalafellin Kaftan', # match world and HQ and item name pattern
@@ -64,4 +68,4 @@ describe 'about Oden::Command::MarketBoard#parse_message' => sub {
     };
 };
 
-runtests();
+done_testing();

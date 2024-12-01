@@ -1,8 +1,6 @@
-use strict;
-use warnings;
-use utf8;
-
-use Test::Spec;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use Oden::Command::AYT;
 use List::Util qw/shuffle/;
@@ -10,9 +8,8 @@ use String::Random;
 
 describe 'about Oden::Command::AYT#run' => sub {
     my $hash;
-    share %$hash;
 
-    before all => sub {
+    before_all "setup" => sub {
         my $create_ayt = sub {
             my $are_part = [ # A,R,Are
                 String::Random->new->randregex("[Rr]"),
@@ -41,14 +38,14 @@ describe 'about Oden::Command::AYT#run' => sub {
         $hash->{create_ayt} = $create_ayt
     };
 
-    context 'case call run method without arguments' => sub {
+    describe 'case call run method without arguments' => sub {
         it 'when returns undef' => sub {
             my $res = Oden::Command::AYT->run();
             is $res, undef;
         };
     };
 
-    context 'case call run method with "Are You There?"' => sub {
+    describe 'case call run method with "Are You There?"' => sub {
 
         it 'when returns "[yes]"' => sub {
             for(1..10){
@@ -58,10 +55,6 @@ describe 'about Oden::Command::AYT#run' => sub {
             }
         };
     };
-
-
 };
 
-# XXX: forkprove has caller
-# runtests unless caller;
-runtests();
+done_testing;

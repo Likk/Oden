@@ -1,17 +1,15 @@
 use 5.40.0;
-use utf8;
+use Test2::V0;
+use Test2::Tools::Spec;
+use Test2::Tools::Warnings qw/warnings/;
 
-use Test::Spec;
-use Test::Exception;
-use Test::Warn;
 use Furl::Response;
 use Oden::API::Discord;
 
 describe 'about Oden::API::Discord#join_thread' => sub {
     my $hash;
-    share %$hash;
 
-    before all => sub {
+    before_all "setup" => sub {
         $hash->{invalid_token}      = 'this_is_invalid_token';
         $hash->{unknown_thread_id}  = 000;
         $hash->{invalid_thread_id}  = 111;
@@ -20,146 +18,170 @@ describe 'about Oden::API::Discord#join_thread' => sub {
         $hash->{valid_channel_id} = 999;
     };
 
-    context "Negative testing" => sub {
-        context "case token is not valid" => sub {
-            around {
+    describe "Negative testing" => sub {
+        describe "case token is not valid" => sub {
+            around_all "mockup" => sub {
+                my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{invalid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = Furl->stubs(+{
-                    request => sub {
-                        Furl::Response->new(
-                            1,
-                            '401',
-                            "Unauthorized",
-                            +{
-                                'content-type' => 'application/json'
-                            },
-                            q|{"message": "401: Unauthorized", "code": 0}|
-                        );
-                    },
-                });
+                $hash->{mocks}->{furl} = mock "Furl" => (
+                    override => [
+                        request => sub {
+                            Furl::Response->new(
+                                1,
+                                '401',
+                                "Unauthorized",
+                                +{
+                                    'content-type' => 'application/json'
+                                },
+                                q|{"message": "401: Unauthorized", "code": 0}|
+                            );
+                        },
+                    ],
+                );
 
-                yield;
+                $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
 
             };
 
             it 'when return false and warnings' => sub {
-                warnings_like {
+                my $warnings = warnings {
                     my $res = $hash->{api}->join_thread(
                         $hash->{valid_channel_id},
                     );
                     is $res, false;
-                } [qr/401/, qr/Unauthorized/];
+                };
+
+                like $warnings->[0], qr/401/;
+                like $warnings->[1], qr/Unauthorized/;
             };
         };
 
-        context "case unknown channel_id" => sub {
-            around {
+        describe "case unknown channel_id" => sub {
+            around_all "mockup" => sub {
+                my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = Furl->stubs(+{
-                    request => sub {
-                        Furl::Response->new(
-                            1,
-                            '404',
-                            "Not Found",
-                            +{
-                                'content-type' => 'application/json'
-                            },
-                            q|{"message": "Unknown Channel", "code": 10003}|
-                        );
-                    },
-                });
+                $hash->{mocks}->{furl} = mock "Furl" => (
+                    override => [
+                        request => sub {
+                            Furl::Response->new(
+                                1,
+                                '404',
+                                "Not Found",
+                                +{
+                                    'content-type' => 'application/json'
+                                },
+                                q|{"message": "Unknown Channel", "code": 10003}|
+                            );
+                        },
+                    ],
+                );
 
-                yield;
+                $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
             };
             it 'when return false and warnings' => sub {
-                warnings_like {
+                my $warnings = warnings {
                     my $res = $hash->{api}->join_thread(
                         $hash->{unknown_thread_id},
                     );
                     is $res, false;
-                } [qr/404/, qr/Not Found/];
+                };
+
+                like $warnings->[0], qr/404/;
+                like $warnings->[1], qr/Not Found/;
             };
         };
 
-        context "case invalid channel_id" => sub {
-            around {
+        describe "case invalid channel_id" => sub {
+            around_all "mockup" => sub {
+                my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = Furl->stubs(+{
-                    request => sub {
-                        Furl::Response->new(
-                            1,
-                            '403',
-                            "Forbidden",
-                            +{
-                                'content-type' => 'application/json'
-                            },
-                            q|{"message": "Missing Access", "code": 50001}|
-                        );
-                    },
-                });
+                $hash->{mocks}->{furl} = mock "Furl" => (
+                    override => [
+                        request => sub {
+                            Furl::Response->new(
+                                1,
+                                '403',
+                                "Forbidden",
+                                +{
+                                    'content-type' => 'application/json'
+                                },
+                                q|{"message": "Missing Access", "code": 50001}|
+                            );
+                        },
+                    ],
+                );
 
-                yield;
+                $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
             };
             it 'when return false and warnings' => sub {
-                warnings_like {
+                my $warnings = warnings {
                     my $res = $hash->{api}->join_thread(
                         $hash->{invalid_thread_id},
                     );
                     is $res, false;
-                } [qr/403/, qr/Forbidden/];
+                };
+
+                like $warnings->[0], qr/403/;
+                like $warnings->[1], qr/Forbidden/;
             };
         };
 
-        context "case thread_id is not set" => sub {
-            around {
+        describe "case thread_id is not set" => sub {
+            around_all "mockup" => sub {
+                my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
 
-                yield;
+                $tests->();
 
                 delete $hash->{api};
             };
             it 'when throw exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     $hash->{api}->join_thread();
-                } qr/Too few arguments for method join_thread/;
+                };
+
+                like $throws, qr/Too few arguments for method join_thread/;
             };
         };
     };
 
-    context "Positive testing" => sub {
-        context "case user_id is valid" => sub {
-            around {
+    describe "Positive testing" => sub {
+        describe "case user_id is valid" => sub {
+            around_all "mockup" => sub {
+                my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
-                $hash->{stubs}->{furl} = Furl->stubs(+{
-                    request => sub {
-                        Furl::Response->new(
-                            1,
-                            '204',
-                            "No Content",
-                            +{
-                                'content-type' => 'text/html; charset=utf-8' #optional. But discord server return this.
-                            },
-                            ''
-                        );
-                    },
-                });
+                $hash->{mocks}->{furl} = mock "Furl" => (
+                    override => [
+                        request => sub {
+                            Furl::Response->new(
+                                1,
+                                '204',
+                                "No Content",
+                                +{
+                                    'content-type' => 'text/html; charset=utf-8' #optional. But discord server return this.
+                                },
+                                ''
+                            );
+                        },
+                    ],
+                );
 
-                yield;
+                $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
             };
             it 'when return user object' => sub {
                 my $res = $hash->{api}->join_thread(
@@ -171,4 +193,4 @@ describe 'about Oden::API::Discord#join_thread' => sub {
     };
 };
 
-runtests();
+done_testing();

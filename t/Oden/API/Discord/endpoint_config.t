@@ -1,26 +1,23 @@
-use strict;
-use warnings;
-use utf8;
-
-use Test::Spec;
-use Test::Exception;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::ClassicCompare qw/is_deeply/;
+use Test2::Tools::Spec;
 
 use Oden::API::Discord;
 
 describe 'about Oden::API::Discord#endpoint_config' => sub {
     my $hash;
-    share %$hash;
 
-    before all => sub {
+    before_all "setup" => sub {
         $hash->{discord} = Oden::API::Discord->new(token => 'dummy');
     };
 
-    context "call endpoint_config method" => sub {
+    describe "call endpoint_config method" => sub {
         it 'will return endpoint list' => sub {
             my $discord   = $hash->{discord};
             my $endpoints = $discord->endpoint_config();
 
-            isa_ok $endpoints, 'HASH';
+            ref_ok $endpoints, 'HASH';
             is_deeply $endpoints, +{
                 show_message       => 'https://discordapp.com/api/channels/%s/messages/%s',
                 show_channel       => 'https://discordapp.com/api/channels/%s',
@@ -31,4 +28,4 @@ describe 'about Oden::API::Discord#endpoint_config' => sub {
     };
 };
 
-runtests();
+done_testing();

@@ -1,9 +1,7 @@
 use 5.40.0;
 use autodie;
-
-use Test::Spec;
-use Test::Exception;
-
+use Test2::V0;
+use Test2::Tools::Spec;
 use Oden::Model::Dictionary;
 use Storable qw/retrieve/;
 
@@ -11,9 +9,8 @@ local $ENV{DICT_DIR} = '/tmp/oden_model_dictionary';
 
 describe 'about Oden::Model::Dictionary#set' => sub {
     my $hash;
-    share %$hash;
 
-    before all => sub {
+    before_all "setup" => sub {
         $hash->{file} = 'set.dat';
         mkdir $ENV{DICT_DIR} if !-d $ENV{DICT_DIR};
 
@@ -23,26 +20,27 @@ describe 'about Oden::Model::Dictionary#set' => sub {
         $hash->{dictionary} = $dictionary;
     };
 
-    after all => sub {
+    after_all "cleanup" => sub {
          unlink sprintf("%s/%s", $ENV{DICT_DIR}, $hash->{file}) if -e sprintf("%s/%s", $ENV{DICT_DIR}, $hash->{file});
          rmdir $ENV{DICT_DIR};
     };
 
-    context 'Negative testing' => sub {
-        context 'case no parameter' => sub {
+    describe 'Negative testing' => sub {
+        describe 'case no parameter' => sub {
             it 'when no parameter' => sub {
-                throws_ok {
+                my $throws = dies {
                     $hash->{dictionary}->set();
-                } qr/Too few arguments for method set/, 'no parameter';
+                };
+                like $throws, qr/Too few arguments for method set/, 'no parameter';
             };
         };
-        context 'case no key' => sub {
+        describe 'case no key' => sub {
             it 'when return false' => sub {
                 my $res =  $hash->{dictionary}->set('' => 'bar');
                 is $res, false, 'no key';
             };
         };
-        context 'case no value' => sub {
+        describe 'case no value' => sub {
             it 'when return false' => sub {
                 my $res = $hash->{dictionary}->set('foo' => '');
                 is $res, false, 'no value';
@@ -50,11 +48,13 @@ describe 'about Oden::Model::Dictionary#set' => sub {
         };
     };
 
-    context 'Positive testing' => sub {
-        context 'case call set method' => sub {
-           it 'when return true' => sub {
-                my $dictionary = $hash->{dictionary};
-                my $res = $dictionary->set('foo' => 'bar');
+    describe 'Positive testing' => sub {
+        describe 'case call set method' => sub {
+            before_all "create dictionary" => sub {
+                $hash->{currect} = $hash->{dictionary}->set('foo' => 'bar');
+            };
+            it 'when return true' => sub {
+                my $res = $hash->{currect};
                 is $res, true, 'set correct';
             };
 
@@ -64,14 +64,17 @@ describe 'about Oden::Model::Dictionary#set' => sub {
             };
         };
 
-        context 'case call set already exists key' => sub {
+        describe 'case call set already exists key' => sub {
+            before_all "create dictionary" => sub {
+                $hash->{dictionary}->set('foo2' => 'bar');
+            };
             it 'when dont overwrite' => sub {
                 my $dictionary = $hash->{dictionary};
-                my $res = $dictionary->set('foo' => 'bar2');
+                my $res = $dictionary->set('foo2' => 'bar2');
                 is $res, false, 'already exists key';
             };
         };
     };
 };
 
-runtests();
+done_testing();

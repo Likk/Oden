@@ -1,32 +1,34 @@
-use strict;
-use warnings;
-use utf8;
-use Test::Exception;
-use Test::Spec;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
+
 use Oden::Bot::Discord;
 
 describe 'about Oden::Bot::Discord#run' => sub {
-    my $hash;
-    share %$hash;
+    my $hash = {};
 
-    before all => sub {
-        $hash->{stubs} =+{
-            connect => AnyEvent::WebSocket::Client->stubs(
-                connect => sub {
-                    $hash->{called}->{connect} = 1;
-                    return AE::cv;
-                },
-            ),
-            recv => AnyEvent::CondVar->stubs(
-                recv => sub {
-                    $hash->{called}->{recv} = 1;
-                },
-            ),
+    before_all setup => sub {
+        $hash->{mocks} =+{
+            connect => mock("AnyEvent::WebSocket::Client" => (
+                override => [
+                    connect => sub {
+                        $hash->{called}->{connect} = 1;
+                        return AE::cv;
+                    },
+                ],
+            )),
+            recv    =>  mock("AnyEvent::CondVar" => (
+                override => [
+                    recv => sub {
+                        $hash->{called}->{recv} = 1;
+                    },
+                ],
+            )),
         };
     };
 
-    context 'when call run method' => sub {
-        before all => sub {
+    describe 'when call run method' => sub {
+        before_all create_bot_instance => sub {
             my $discord_bot = Oden::Bot::Discord->new(token => 'your token');
             $hash->{bot}    = $discord_bot->run();
 
@@ -49,4 +51,4 @@ describe 'about Oden::Bot::Discord#run' => sub {
     };
 };
 
-runtests;
+done_testing();

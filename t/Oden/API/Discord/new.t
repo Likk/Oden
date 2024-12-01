@@ -1,34 +1,31 @@
-use strict;
-use warnings;
-use utf8;
-
-use Test::Spec;
-use Test::Exception;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use Oden::API::Discord;
 
 describe 'about Oden::API::Discord#new' => sub {
     my $hash;
-    share %$hash;
 
-    context "Negative testing" => sub {
-        context "token parameter is not set" => sub {
+    describe "Negative testing" => sub {
+        describe "token parameter is not set" => sub {
             it 'throw exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     Oden::API::Discord->new()
-                } qr/require token parameter/;
+                };
+                like $throws, qr/require token parameter/;
             };
         };
     };
 
-    context "Positive testing" => sub {
-        context "token parameter is set" => sub {
-            before all => sub {
+    describe "Positive testing" => sub {
+        describe "token parameter is set" => sub {
+            before_all "create Oden::API::Discord object"  => sub {
                 $hash->{api} = Oden::API::Discord->new(token => 'dummy');
             };
             it 'return Oden::API::Discord object' => sub {
                 my $api = $hash->{api};
-                isa_ok $api, 'Oden::API::Discord';
+                isa_ok $api, ['Oden::API::Discord'];
             };
             it 'object has default hash' => sub {
                 my $api = $hash->{api};
@@ -40,4 +37,4 @@ describe 'about Oden::API::Discord#new' => sub {
     };
 };
 
-runtests();
+done_testing();

@@ -1,70 +1,74 @@
-use strict;
-use warnings;
-use utf8;
-use Test::Exception;
-use Test::Spec;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
+
 use Oden::Bot;
 
 describe 'about Oden::Bot#talk' => sub {
-    my $hash;
-    share %$hash;
+    my $hash = {};
 
-    context 'Negative testing' => sub {
-        context 'when parameter is not set' => sub {
+    describe 'Negative testing' => sub {
+        describe 'when parameter is not set' => sub {
             it 'should exception' => sub {
-                throws_ok {
+                my $throw = dies {
                     Oden::Bot->talk;
-                } qr/Too few arguments for method talk/;
+                };
+                like $throw, qr/Too few arguments for method talk/;
             };
         };
-        context 'when content is not set' => sub {
+        describe 'when content is not set' => sub {
             it 'should exception' => sub {
-                throws_ok {
+                my $throw = dies {
                     Oden::Bot->talk(undef, 1, 'username');
-                } qr/did not pass type constraint "Str"/;
+                };
+                like $throw, qr/did not pass type constraint "Str"/;
             };
         };
-        context 'when guild_id is not set' => sub {
+        describe 'when guild_id is not set' => sub {
             it 'should exception' => sub {
-                throws_ok {
+                my $throw = dies {
                     Oden::Bot->talk('content', undef, 'username');
-                } qr/did not pass type constraint "Int"/;
+                };
+                like $throw, qr/did not pass type constraint "Int"/;
             };
         };
-        context 'when username is not set' => sub {
+        describe 'when username is not set' => sub {
             it 'should exception' => sub {
-                throws_ok {
+                my $throw = dies {
                     Oden::Bot->talk('content', 1, undef);
-                } qr/did not pass type constraint "Str"/;
+                };
+                like $throw, qr/did not pass type constraint "Str"/;
             };
         };
     };
 
-    context 'Positive testing' => sub {
-        context 'when parameter is set' => sub {
-            context 'when content is ""' => sub {
+    describe 'Positive testing' => sub {
+        describe 'when parameter is set' => sub {
+            describe 'when content is ""' => sub {
                 it 'should return undef' => sub {
                     my $res = Oden::Bot->talk('', 1, 'username');
                     is $res, undef, 'no response';
                 };
             };
-            context 'when content is "slashCommand"' => sub {
-                before all => sub {
-                    $hash->{stubs} = Oden::Dispatcher->stubs(+{
-                        dispatch => sub {
-                            my ($class, $command) = @_;
-                            my $package = sprintf('Oden::Command::%s', ucfirst($command));
-                            my $self =  bless {} , $package;
+            describe 'when content is "slashCommand"' => sub {
+                before_all 'create mock' => sub {
+                    $hash->{mock} = mock "Oden::Dispatcher" => (
+                        override => [
+                            dispatch => sub {
+                                my ($class, $command) = @_;
+                                my $package = sprintf('Oden::Command::%s', ucfirst($command));
+                                my $self =  bless {} , $package;
 
-                            no strict 'refs';
-                            my $subname = sprintf("%s::run", $package);
-                            *{$subname} = sub {
-                                return sprintf("response %s", $command);
-                            };
+                                no strict 'refs';
+                                my $subname = sprintf("%s::run", $package);
+                                *{$subname} = sub {
+                                    return sprintf("response %s", $command);
+                                };
 
-                            return $self;
-                        }
-                    });
+                                return $self;
+                            }
+                        ]
+                    );
                 };
                 it 'should return response' => sub {
                     my $res = Oden::Bot->talk('/SlashCommand', 1, 'username');
@@ -75,4 +79,4 @@ describe 'about Oden::Bot#talk' => sub {
     };
 };
 
-runtests;
+done_testing;

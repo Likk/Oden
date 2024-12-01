@@ -1,18 +1,15 @@
-use strict;
-use warnings;
-
-use Test::Exception;
-use Test::Spec;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use Oden::Entity::CommunicationReceiver;
 use Oden::Command::Dice;
 
 describe 'about Oden::Command::Dice#run' => sub {
     my $hash;
-    share %$hash;
 
-    context 'case message is qr/PARSE_ROLL_PATTERN/' => sub {
-        before all => sub {
+    describe 'case message is qr/PARSE_ROLL_PATTERN/' => sub {
+        before_all "setup CommunicationReceiver" => sub {
             my $receiver = Oden::Entity::CommunicationReceiver->new(
                 message  => '2d10',
                 guild_id => 1,
@@ -20,10 +17,12 @@ describe 'about Oden::Command::Dice#run' => sub {
             );
             $hash->{receiver} = $receiver;
 
-            $hash->{stubs}->{command_dice} = Oden::Command::Dice->stubs(
-                roll_trpg => sub {
-                    return (int(rand(10)) + 1) + (int(rand(10)) + 1);
-                },
+            $hash->{mocks}->{command_dice} = mock "Oden::Command::Dice" => (
+                override => [
+                    roll_trpg => sub {
+                        return (int(rand(10)) + 1) + (int(rand(10)) + 1);
+                    },
+                ],
             );
         };
 
@@ -35,4 +34,4 @@ describe 'about Oden::Command::Dice#run' => sub {
     };
 };
 
-runtests();
+done_testing();

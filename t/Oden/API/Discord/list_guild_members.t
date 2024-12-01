@@ -1,18 +1,15 @@
-use strict;
-use warnings;
-use utf8;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
+use Test2::Tools::Warnings qw/warnings/;
 
-use Test::Spec;
-use Test::Exception;
-use Test::Warn;
 use Furl::Response;
 use Oden::API::Discord;
 
 describe 'about Oden::API::Discord#list_guild_members' => sub {
     my $hash;
-    share %$hash;
 
-    before all => sub {
+    before_all "setup" => sub {
         $hash->{invalid_token}    = 'this_is_invalid_token';
         $hash->{unknown_guild_id} = 000;
         $hash->{invalid_guild_id} = 111;
@@ -21,145 +18,169 @@ describe 'about Oden::API::Discord#list_guild_members' => sub {
         $hash->{valid_guild_id} = 999;
     };
 
-    context "Negative testing" => sub {
-        context "case token is not valid" => sub {
-            around {
+    describe "Negative testing" => sub {
+        describe "case token is not valid" => sub {
+            around_all "mockup" => sub {
+                my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{invalid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = Furl->stubs(+{
-                    request => sub {
-                        Furl::Response->new(
-                            1,
-                            '401',
-                            "Unauthorized",
-                            +{
-                                'content-type' => 'application/json'
-                            },
-                            q|{"message": "401: Unauthorized", "code": 0}|
-                        );
-                    },
-                });
+                $hash->{mocks}->{furl} = mock "Furl" => (
+                    override => [
+                        request => sub {
+                            Furl::Response->new(
+                                1,
+                                '401',
+                                "Unauthorized",
+                                +{
+                                    'content-type' => 'application/json'
+                                },
+                                q|{"message": "401: Unauthorized", "code": 0}|
+                            );
+                        },
+                    ],
+                );
 
-                yield;
+                $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
 
             };
 
             it 'when return undef and warnings' => sub {
-                warnings_like {
+                my $warnings = warnings {
                         my $res = $hash->{api}->list_guild_members($hash->{valid_guild_id});
                     is $res, undef;
-                } [qr/401/, qr/Unauthorized/];
+                };
+
+                like $warnings->[0], qr/401/;
+                like $warnings->[1], qr/Unauthorized/;
             };
         };
 
-        context "case unknown guild_id" => sub {
-            around {
+        describe "case unknown guild_id" => sub {
+            around_all "mockup" => sub {
+                my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = Furl->stubs(+{
-                    request => sub {
-                        Furl::Response->new(
-                            1,
-                            '404',
-                            "Not Found",
-                            +{
-                                'content-type' => 'application/json'
-                            },
-                            q|{"message": "Unknown Guild", "code": 10004}|
-                        );
-                    },
-                });
+                $hash->{mocks}->{furl} = mock "Furl" => (
+                    override => [
+                        request => sub {
+                            Furl::Response->new(
+                                1,
+                                '404',
+                                "Not Found",
+                                +{
+                                    'content-type' => 'application/json'
+                                },
+                                q|{"message": "Unknown Guild", "code": 10004}|
+                            );
+                        },
+                    ],
+                );
 
-                yield;
+                $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
             };
             it 'when return undef and warnings' => sub {
-                warnings_like {
+                my $warnings = warnings {
                     my $res = $hash->{api}->list_guild_members($hash->{unknown_guild_id});
                     is $res, undef;
-                } [qr/404/, qr/Not Found/];
+                };
+
+                like $warnings->[0], qr/404/;
+                like $warnings->[1], qr/Not Found/;
             };
         };
 
-        context "case missing access" => sub {
-            around {
+        describe "case missing access" => sub {
+            around_all "mockup" => sub {
+                my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = Furl->stubs(+{
-                    request => sub {
-                        Furl::Response->new(
-                            1,
-                            '404',
-                            "Not Found",
-                            +{
-                                'content-type' => 'application/json'
-                            },
-                            q|{"message": "Unknown Guild", "code": 10004}|
-                        );
-                    },
-                });
+                $hash->{mocks}->{furl} = mock "Furl" => (
+                    override => [
+                        request => sub {
+                            Furl::Response->new(
+                                1,
+                                '404',
+                                "Not Found",
+                                +{
+                                    'content-type' => 'application/json'
+                                },
+                                q|{"message": "Unknown Guild", "code": 10004}|
+                            );
+                        },
+                    ],
+                );
 
-                yield;
+                $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
             };
             it 'when return undef and warnings' => sub {
-            warnings_like {
+                my $warnings = warnings {
                     my $res = $hash->{api}->list_guild_members($hash->{invalid_guild_id});
                     is $res, undef;
-                } [qr/404/, qr/Not Found/];
+                };
 
+                like $warnings->[0], qr/404/;
+                like $warnings->[1], qr/Not Found/;
             };
         };
 
-        context "case channel_id is not set" => sub {
-            around {
+        describe "case channel_id is not set" => sub {
+            around_all "mockup" => sub {
+                my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
 
-                yield;
+                $tests->();
 
                 delete $hash->{api};
             };
             it 'when throw exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     $hash->{api}->list_guild_members();
-                } qr/Too few arguments for method list_guild_members/;
+                };
+
+                like $throws, qr/Too few arguments for method list_guild_members/;
             };
         };
     };
 
-    context "Positive testing" => sub {
-        context "case guild_id is valid" => sub {
-            around {
+    describe "Positive testing" => sub {
+        describe "case guild_id is valid" => sub {
+            around_all "mockup" => sub {
+                my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
-                $hash->{stubs}->{furl} = Furl->stubs(+{
-                    request => sub {
-                        Furl::Response->new(
-                            1,
-                            '200',
-                            "OK",
-                            +{
-                                'content-type' => 'application/json'
-                            },
-                            q|[{"avatar": null,"nick": null,"pending": false,"user": {"id": "111","username": "name","bot": true}}]|
-                        );
-                    },
-                });
 
-                yield;
+                $hash->{mocks}->{furl} = mock "Furl" => (
+                    override => [
+                        request => sub {
+                            Furl::Response->new(
+                                1,
+                                '200',
+                                "OK",
+                                +{
+                                    'content-type' => 'application/json'
+                                },
+                                q|[{"avatar": null,"nick": null,"pending": false,"user": {"id": "111","username": "name","bot": true}}]|
+                            );
+                        },
+                    ],
+                );
+
+                $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
             };
             it 'when return user object' => sub {
                 my $res = $hash->{api}->list_guild_members($hash->{valid_guild_id});
-                isa_ok $res, 'ARRAY';
+                ref_ok $res, 'ARRAY';
                 is $res->[0]->{user}->{id}, '111';
                 is $res->[0]->{user}->{username}, 'name';
             };
@@ -167,4 +188,4 @@ describe 'about Oden::API::Discord#list_guild_members' => sub {
     };
 };
 
-runtests();
+done_testing();

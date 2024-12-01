@@ -1,29 +1,28 @@
-use strict;
-use warnings;
-
-use Test::Exception;
-use Test::Spec;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use Oden::Entity::CommunicationReceiver;
 use Oden::Command::MarketBoard;
 
 describe 'about Oden::Command::MarketBoard#format_response' => sub {
     my $hash;
-    share %$hash;
 
-    context 'Negative testing' => sub {
-        context 'case no parametor' => sub {
+    describe 'Negative testing' => sub {
+        describe 'case no parametor' => sub {
             it 'when throws exception' => sub {
-                throws_ok {
+                my $throws = dies {
                     Oden::Command::MarketBoard->format_response();
-                } qr/Too few arguments for fun format_response/;
+                };
+
+                like $throws, qr/Too few arguments for fun format_response/;
             };
         };
     };
 
-    context 'Positive testing' => sub {
-        context 'case message is "zeromus Lalafellin Kaftan"' => sub {
-            before all => sub {
+    describe 'Positive testing' => sub {
+        describe 'case message is "zeromus Lalafellin Kaftan"' => sub {
+            before_all "setup market records" => sub {
                 my $res = +{
                     'records' => [
                         +{
@@ -67,4 +66,4 @@ EOT
 
 };
 
-runtests;
+done_testing;
