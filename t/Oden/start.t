@@ -11,7 +11,7 @@ describe 'about Oden#start' => sub {
         before_all "setup" => sub {
             $hash->{oden} = Oden->new(token => 'your token');
 
-            $hash->{stubs} = mock "Oden::Bot::Discord" => (
+            $hash->{mocks} = mock "Oden::Bot::Discord" => (
                 override => [
                     run => sub { 'called Oden::Bot::Discord#run' },
                 ],

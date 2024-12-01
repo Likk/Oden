@@ -24,7 +24,7 @@ describe 'about Oden::API::Discord#list_guild_members' => sub {
                 my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{invalid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = mock "Furl" => (
+                $hash->{mocks}->{furl} = mock "Furl" => (
                     override => [
                         request => sub {
                             Furl::Response->new(
@@ -43,7 +43,7 @@ describe 'about Oden::API::Discord#list_guild_members' => sub {
                 $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
 
             };
 
@@ -63,7 +63,7 @@ describe 'about Oden::API::Discord#list_guild_members' => sub {
                 my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = mock "Furl" => (
+                $hash->{mocks}->{furl} = mock "Furl" => (
                     override => [
                         request => sub {
                             Furl::Response->new(
@@ -82,7 +82,7 @@ describe 'about Oden::API::Discord#list_guild_members' => sub {
                 $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
             };
             it 'when return undef and warnings' => sub {
                 my $warnings = warnings {
@@ -100,7 +100,7 @@ describe 'about Oden::API::Discord#list_guild_members' => sub {
                 my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = mock "Furl" => (
+                $hash->{mocks}->{furl} = mock "Furl" => (
                     override => [
                         request => sub {
                             Furl::Response->new(
@@ -119,7 +119,7 @@ describe 'about Oden::API::Discord#list_guild_members' => sub {
                 $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
             };
             it 'when return undef and warnings' => sub {
                 my $warnings = warnings {
@@ -157,7 +157,7 @@ describe 'about Oden::API::Discord#list_guild_members' => sub {
                 my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = mock "Furl" => (
+                $hash->{mocks}->{furl} = mock "Furl" => (
                     override => [
                         request => sub {
                             Furl::Response->new(
@@ -176,7 +176,7 @@ describe 'about Oden::API::Discord#list_guild_members' => sub {
                 $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
             };
             it 'when return user object' => sub {
                 my $res = $hash->{api}->list_guild_members($hash->{valid_guild_id});

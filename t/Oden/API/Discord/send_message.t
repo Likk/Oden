@@ -25,7 +25,7 @@ describe 'about Oden::API::Discord#send_message' => sub {
                 my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{invalid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = mock "Furl" => (
+                $hash->{mocks}->{furl} = mock "Furl" => (
                     override => [
                         request => sub {
                             Furl::Response->new(
@@ -44,7 +44,7 @@ describe 'about Oden::API::Discord#send_message' => sub {
                 $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
 
             };
 
@@ -67,7 +67,7 @@ describe 'about Oden::API::Discord#send_message' => sub {
                 my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = mock "Furl" => (
+                $hash->{mocks}->{furl} = mock "Furl" => (
                     override => [
                         request => sub {
                             Furl::Response->new(
@@ -86,7 +86,7 @@ describe 'about Oden::API::Discord#send_message' => sub {
                 $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
             };
             it 'when return false and warnings' => sub {
                 my $warnings = warnings {
@@ -107,7 +107,7 @@ describe 'about Oden::API::Discord#send_message' => sub {
                 my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
 
-                $hash->{stubs}->{furl} = mock "Furl" => (
+                $hash->{mocks}->{furl} = mock "Furl" => (
                     override => [
                         request => sub {
                             Furl::Response->new(
@@ -126,7 +126,7 @@ describe 'about Oden::API::Discord#send_message' => sub {
                 $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
             };
             it 'when return false and warnings' => sub {
                 my $warnings = warnings {
@@ -184,7 +184,7 @@ describe 'about Oden::API::Discord#send_message' => sub {
             around_all "mockup" => sub {
                 my $tests = shift;
                 $hash->{api} = Oden::API::Discord->new(token => $hash->{valid_token}, interval => 0);
-                $hash->{stubs}->{furl} = mock "Furl" => (
+                $hash->{mocks}->{furl} = mock "Furl" => (
                     override => [
                         request => sub {
                             Furl::Response->new(
@@ -203,7 +203,7 @@ describe 'about Oden::API::Discord#send_message' => sub {
                 $tests->();
 
                 delete $hash->{api};
-                delete $hash->{stubs}->{furl};
+                delete $hash->{mocks}->{furl};
             };
             it 'when return user object' => sub {
                 my $res = $hash->{api}->send_message(
