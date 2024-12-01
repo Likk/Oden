@@ -48,3 +48,16 @@ method start() {
     );
     $bot->run();
 }
+
+=head1 LICENSE
+
+Copyright (C) Likkradyus.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Likkradyus Winston. E<lt>perl {at} li {dot} que {dot} jpE<gt>
+
+=cut

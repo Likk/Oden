@@ -1,7 +1,7 @@
-use strict;
-use warnings;
-
-use Test::Spec;
+use 5.40.0;
+use autodie;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use File::Temp qw/tempdir/;
 use Oden::Entity::CommunicationReceiver;
@@ -11,12 +11,11 @@ local $ENV{DICT_DIR} = tempdir( CLEANUP => 1 );
 
 describe 'about Oden::Command::Dictionary#run' => sub {
     my $hash;
-    share %$hash;
 
-    context 'message prefix `add`' => sub {
+    describe 'message prefix `add`' => sub {
         # Negative testing
-        context 'case message pattern is `add` only. no key, no value' => sub {
-            before all => sub {
+        describe 'case message pattern is `add` only. no key, no value' => sub {
+            before_all "setup CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => 'add',
                     guild_id => 1,
@@ -31,12 +30,12 @@ describe 'about Oden::Command::Dictionary#run' => sub {
             };
         };
 
-        context 'case message pattern is `add <key>` only. no value' => sub {
-            before all => sub {
+        describe 'case message pattern is `add <key>` only. no value' => sub {
+            before_all "setup CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => 'add foo',
                     guild_id => 1,
-                    username => 'test_dict_add',
+                    username => 'test_dict_add'
                 );
                 $hash->{receiver} = $receiver;
             };
@@ -48,8 +47,8 @@ describe 'about Oden::Command::Dictionary#run' => sub {
         };
 
         # Positive testing
-        context 'case message pattern is `add <key> <value>`' => sub {
-            before all => sub {
+        describe 'case message pattern is `add <key> <value>`' => sub {
+            before_all "setup CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => 'add foo bar',
                     guild_id => 1,
@@ -58,29 +57,37 @@ describe 'about Oden::Command::Dictionary#run' => sub {
                 $hash->{receiver} = $receiver;
 
             };
-            context 'case success' => sub {
-                before all => sub {
-                    $hash->{mock}->{dict} = Oden::Model::Dictionary->stubs('set', sub {
-                        return 1;
-                    });
+            describe 'case success' => sub {
+                before_all "setup CommunicationReceiver" => sub {
+                    $hash->{mock}->{dict} = mock "Oden::Model::Dictionary" => (
+                        override => [
+                            set => sub {
+                                return 1;
+                            },
+                        ],
+                    );
                 };
 
                 it 'when returns undef' => sub {
                     my $entity = Oden::Command::Dictionary->run($hash->{receiver});
-                    isa_ok $entity, 'Oden::Entity::CommunicationEmitter', 'instance is Oden::Entity::CommunicationEmitter';
+                    isa_ok $entity, ['Oden::Entity::CommunicationEmitter'], 'instance is Oden::Entity::CommunicationEmitter';
                     is     $entity->as_content, 'registrated', 'add key and value';
                 };
             };
-            context 'case failure' => sub {
-                before all => sub {
-                    $hash->{mock}->{dict} = Oden::Model::Dictionary->stubs('set', sub {
-                        return 0;
-                    });
+            describe 'case failure' => sub {
+                before_all "setup CommunicationReceiver" => sub {
+                    $hash->{mock}->{dict} = mock "Oden::Model::Dictionary" => (
+                        override => [
+                            set => sub {
+                                return 0;
+                            },
+                        ],
+                    );
                 };
 
                 it 'when returns undef' => sub {
                     my $entity = Oden::Command::Dictionary->run($hash->{receiver});
-                    isa_ok $entity, 'Oden::Entity::CommunicationEmitter', 'instance is Oden::Entity::CommunicationEmitter';
+                    isa_ok $entity, ['Oden::Entity::CommunicationEmitter'], 'instance is Oden::Entity::CommunicationEmitter';
                     is     $entity->as_content, 'the key already exists', 'failed to add key and value';
                 };
             };
@@ -89,4 +96,4 @@ describe 'about Oden::Command::Dictionary#run' => sub {
 
 };
 
-runtests();
+done_testing();

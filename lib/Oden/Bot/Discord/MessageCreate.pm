@@ -48,7 +48,7 @@ fun message_create(AnyEvent::Discord $client, HashRef $data, @args) :Return(Bool
     my $content = $data->{content};
 
     # bot には反応しない
-    return 0 if $data->{author}->{bot};
+    return false if $data->{author}->{bot};
 
     #TODO: thread
     my $channel_name = $client->channels->{$data->{channel_id}} || 'thread';
@@ -66,7 +66,7 @@ fun message_create(AnyEvent::Discord $client, HashRef $data, @args) :Return(Bool
         $data->{author}->{username}
     );
 
-    return 0 unless($res);
+    return false unless($res);
 
     # レスポンスが Oden::Response::Dictionary の場合はファイルを添付して送信
     if($res->isa('Oden::Entity::CommunicationEmitter::FileDownload')){
@@ -75,13 +75,13 @@ fun message_create(AnyEvent::Discord $client, HashRef $data, @args) :Return(Bool
     }
     # レスポンスが Oden::Response::CommunicationEmitter の場合は as_content() が返信本文
     elsif($res->isa('Oden::Entity::CommunicationEmitter')){
-        return 0 if $res->is_empty;
+        return false if $res->is_empty;
         $client->send($data->{channel_id}, $res->as_content);
     }
     else { #型がなければ通常のテキスト返信
         $client->send($data->{channel_id}, $res) if $res
     }
-    return 1;
+    return true;
 };
 
 =head1 SEE ALSO

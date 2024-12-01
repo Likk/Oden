@@ -45,7 +45,7 @@ fun message_update(AnyEvent::Discord $client, HashRef $data, @args) :Return(Bool
     my $discord = Oden::API::Discord->new( token => $client->token );
     my $content = $data->{content};
 
-    return 0 if $data->{author}->{bot};
+    return false if $data->{author}->{bot};
     # XXX: スレッド作成は message_update で送られてくる。
     #      既存メッセージの更新がないのに、メッセージ更新でおくられくるもの、かつ flags が 32 (= has_thread )をスレッド作成として扱う
     if( $data->{flags}                 &&
@@ -56,18 +56,18 @@ fun message_update(AnyEvent::Discord $client, HashRef $data, @args) :Return(Bool
     ){
         # スレッド情報が取れたら取る
         my $message      = $discord->show_message($data->{channel_id}, $data->{id});
-        return unless $message->{thread}->{owner_id};
+        return false unless $message->{thread}->{owner_id};
 
         # スレッドのあるチャンネルの情報が知りたい
         my $channel    = $discord->show_channel($message->{channel_id});
 
         ##チャンネル権限の設定がしてあったら閲覧者限定されてるので反応しない方がいい
         my $is_private = scalar @{ $channel->{permission_overwrites} };
-        return 0 if $is_private;
+        return false if $is_private;
 
         # スレッドは誰が作ったのか知りたい
         my $owner        = $discord->show_user($message->{thread}->{owner_id});
-        return 0 unless $owner->{username};
+        return false unless $owner->{username};
 
         my $res = sprintf("`%s` create thread `%s` in `%s` =>  https://discord.com/channels/%s/%s\n",
             # who, what, when.
@@ -84,6 +84,10 @@ fun message_update(AnyEvent::Discord $client, HashRef $data, @args) :Return(Bool
 
         $client->send($post_channel_id, $res) if $res;
         $discord->join_thread($data->{id});
+        return true;
+    }
+    else {
+        return false;
     }
 }
 

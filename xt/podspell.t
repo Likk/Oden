@@ -1,15 +1,21 @@
-use Test::More;
+use 5.40.0;
+use Test2::V0;
+use Test::Spelling;
 
-eval q{ use Test::Spelling };
-plan skip_all => "Test::Spelling is not installed." if $@;
-
-add_stopwords(map { split /[\s\:\-]/ } <DATA>);
+add_stopwords(
+    map {
+        split /[\s\:\-]/
+    }
+    grep {
+        $_ !~ /^#/
+    } <DATA>
+);
 all_pod_files_spelling_ok('lib');
 
-my $d = do { no strict 'refs'; \*{"main::DATA"} };
-
 __DATA__
+# annotation
 XXX
+# Oden::Logger
 critf
 warnf
 infof

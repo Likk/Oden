@@ -1,18 +1,15 @@
-use strict;
-use warnings;
-
-use Test::Exception;
-use Test::Spec;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use Oden::Entity::CommunicationReceiver;
 use Oden::Command::Dice;
 
 describe 'about Oden::Command::Dice#run' => sub {
     my $hash;
-    share %$hash;
 
-    context 'case message is "loot"' => sub {
-        before all => sub {
+    describe 'case message is "loot"' => sub {
+        before_all "setup CommunicationReceiver"=> sub {
             my $receiver = Oden::Entity::CommunicationReceiver->new(
                 message  => 'loot',
                 guild_id => 1,
@@ -21,7 +18,7 @@ describe 'about Oden::Command::Dice#run' => sub {
             $hash->{receiver} = $receiver;
         };
 
-        they 'when returns 1to99 result' => sub {
+        tests 'when returns 1to99 result' => sub {
             for (1..100){
                 my $entity  = Oden::Command::Dice->run($hash->{receiver});
                 my $content = $entity->as_content;
@@ -36,4 +33,4 @@ describe 'about Oden::Command::Dice#run' => sub {
 
 };
 
-runtests();
+done_testing();

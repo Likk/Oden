@@ -246,7 +246,7 @@ method is_equipment() :Return(Bool){
 =cut
 
 method is_fishable() :Return(Bool){
-    return $self->{ItemUICategory} == 47 ? 1 : 0;
+    return $self->{ItemUICategory} == 47 ? true : false;
 }
 
 =head2 is_tradable
@@ -256,7 +256,7 @@ method is_fishable() :Return(Bool){
 =cut
 
 method is_tradable() :Return(Bool){
-    return ($self->{IsUntradable} eq 'False') ? 1 : 0;
+    return ($self->{IsUntradable} eq 'False') ? true : false;
 }
 
 

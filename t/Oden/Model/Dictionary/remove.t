@@ -1,19 +1,16 @@
 use 5.40.0;
 use autodie;
-
-use Test::Spec;
-use Test::Exception;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use Oden::Model::Dictionary;
-use Storable qw/retrieve/;
 
 local $ENV{DICT_DIR} = '/tmp/oden_model_dictionary';
 
 describe 'about Oden::Model::Dictionary#remove' => sub {
     my $hash;
-    share %$hash;
 
-    before all => sub {
+    before_all "setup" => sub {
         $hash->{file} = 'remove.dat';
         mkdir $ENV{DICT_DIR} if !-d $ENV{DICT_DIR};
 
@@ -23,49 +20,50 @@ describe 'about Oden::Model::Dictionary#remove' => sub {
         $hash->{dictionary} = $dictionary;
     };
 
-    after all => sub {
+    after_all "cleanup" => sub {
          unlink sprintf("%s/%s", $ENV{DICT_DIR}, $hash->{file}) if -e sprintf("%s/%s", $ENV{DICT_DIR}, $hash->{file});
          rmdir $ENV{DICT_DIR};
     };
 
-    context 'Negative testing' => sub {
-        context 'case no parameter' => sub {
+    describe 'Negative testing' => sub {
+        describe 'case no parameter' => sub {
             it 'when no parameter' => sub {
-                throws_ok {
+                my $throws = dies {
                     $hash->{dictionary}->remove();
-                } qr/Too few arguments for method remove/, 'no parameter';
+                };
+                like $throws, qr/Too few arguments for method remove/, 'no parameter';
             };
         };
-        context 'case no key' => sub {
-            it 'when return 0' => sub {
+        describe 'case no key' => sub {
+            it 'when return false' => sub {
                 my $res =  $hash->{dictionary}->remove('');
-                is $res, 0, 'no key';
+                is $res, false, 'no key';
             };
         };
     };
 
-    context 'Positive testing' => sub {
-        context 'case doesnt exist key' => sub {
-           it 'when return 0' => sub {
+    describe 'Positive testing' => sub {
+        describe 'case doesnt exist key' => sub {
+            it 'when return false' => sub {
                 my $dictionary = $hash->{dictionary};
                 my $res = $dictionary->remove('foo');
-                is $res, 0, 'cant remove';
+                is $res, false, 'cant remove';
             };
         };
 
-        context 'case already exists key' => sub {
-            before all => sub {
-                $hash->{dictionary}->set('foo' => 'bar');
+        describe 'case already exists key' => sub {
+            before_all "create dictionary" => sub {
+                $hash->{dictionary}->set('foo2' => 'bar');
             };
             it 'when can remove' => sub {
                 my $dictionary = $hash->{dictionary};
-                my $res = $dictionary->remove('foo');
+                my $res = $dictionary->remove('foo2');
 
-                is $res, 1, 'remove correct';
-                is $dictionary->get('foo'), undef, 'remove correct';
+                is $res, true, 'remove correct';
+                is $dictionary->get('foo2'), undef, 'remove correct';
             };
         };
     };
 };
 
-runtests();
+done_testing();

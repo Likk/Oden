@@ -1,15 +1,14 @@
-use strict;
-use warnings;
-use utf8;
-use Test::Spec;
-use Oden::Entity::CommunicationReceiver
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
+
+use Oden::Entity::CommunicationReceiver;
 
 describe 'about Oden::Entity::CommunicationReceiver#new' => sub {
     my $hash;
-    share %$hash;
 
-    context 'when call method' => sub {
-        before all => sub {
+    describe 'when call method' => sub {
+        before_all "setup" => sub {
             $hash->{oden} = Oden::Entity::CommunicationReceiver->new(
                 message  => 'test message',
                 guild_id => 1234567890,
@@ -22,12 +21,12 @@ describe 'about Oden::Entity::CommunicationReceiver#new' => sub {
                 guild_id => 1234567890,
                 username => 'nickname',
             );
-            isa_ok $entity,          'Oden::Entity::CommunicationReceiver', 'instance is Oden::Entity::CommunicationReceiver';
-            is     $entity->message, 'test message',                        'message is "test message"';
-            is     $entity->guild_id, 1234567890,                           'guild_id is 1234567890';
-            is     $entity->username, 'nickname',                           'username is "nickname"';
+            isa_ok $entity,          ['Oden::Entity::CommunicationReceiver'], 'instance is Oden::Entity::CommunicationReceiver';
+            is     $entity->message, 'test message',                          'message is "test message"';
+            is     $entity->guild_id, 1234567890,                             'guild_id is 1234567890';
+            is     $entity->username, 'nickname',                             'username is "nickname"';
         };
     };
 };
 
-runtests;
+done_testing();

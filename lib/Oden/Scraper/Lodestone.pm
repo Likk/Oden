@@ -5,7 +5,6 @@ use base 'Class::Accessor::Fast';
 use Function::Parameters;
 use Function::Return;
 use Furl;
-use Text::Trim;
 use Types::Standard -types;
 use Web::Query;
 
@@ -145,7 +144,7 @@ method brand_section(): Return(HashRef){
         my $anchor = $elem->find(q{a});
         my $image  = $anchor->find(q{img});
         $brand = +{
-            url   => Text::Trim::trim($anchor->attr('href')), # remove space and newline
+            url   => trim($anchor->attr('href')), # remove space and newline
             image => $image->attr('src'),
             alt   => $image->attr('alt'),
         };

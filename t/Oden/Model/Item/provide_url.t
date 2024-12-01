@@ -1,16 +1,14 @@
-use strict;
-use warnings;
-use utf8;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
 
-use Test::Spec;
 use Oden::Model::Item;
 
 describe 'about Oden::Model::Item#(.+)_url' => sub {
     my $hash;
-    share %$hash;
 
-    context "negative testing" => sub {
-        before all => sub {
+    describe "negative testing" => sub {
+        before_all "setup lang_to_name" => sub {
             my $lang_to_name = {
                 jp => "アンティークメイル",
                 na => "Antique Mail",
@@ -22,8 +20,8 @@ describe 'about Oden::Model::Item#(.+)_url' => sub {
         };
 
         for my $lang (qw/jp na de fr/) {
-            context "call miraprisnap_url $lang" => sub {
-                before all => sub {
+            describe "call miraprisnap_url $lang" => sub {
+                before_all "setup item object" => sub {
                     $hash->{item} = Oden::Model::Item->lookup_item_by_name($hash->{lang_to_name}->{$lang});
                 };
                 it "when returns undef. it is not equipment item" => sub {
@@ -34,8 +32,8 @@ describe 'about Oden::Model::Item#(.+)_url' => sub {
         }
     };
 
-    context "positive testing" => sub {
-        before all => sub {
+    describe "positive testing" => sub {
+        before_all "setup lang_to_name" => sub {
             my $lang_to_name = {
                 jp => 'ララフェルカフタン',
                 na => 'Lalafellin Kaftan',
@@ -46,8 +44,8 @@ describe 'about Oden::Model::Item#(.+)_url' => sub {
         };
 
         for my $lang (qw/jp na de fr/) {
-            context "call lodestone_url $lang" => sub {
-                before all => sub {
+            describe "call lodestone_url $lang" => sub {
+                before_all "setup item object" => sub {
                     $hash->{item} = Oden::Model::Item->lookup_item_by_name($hash->{lang_to_name}->{$lang});
                 };
                 it "when returns offical lodestone url ($lang)" => sub {
@@ -58,8 +56,8 @@ describe 'about Oden::Model::Item#(.+)_url' => sub {
         }
 
         for my $lang (qw/jp na de fr/) {
-            context "case call miraprisnap_url $lang" => sub {
-                before all => sub {
+            describe "case call miraprisnap_url $lang" => sub {
+                before_all "setup item object" => sub {
                     $hash->{item} = Oden::Model::Item->lookup_item_by_name($hash->{lang_to_name}->{$lang});
                 };
                 it "when returns miraprisnap keyword search url ($lang)" => sub {
@@ -71,4 +69,4 @@ describe 'about Oden::Model::Item#(.+)_url' => sub {
     };
 };
 
-runtests();
+done_testing();

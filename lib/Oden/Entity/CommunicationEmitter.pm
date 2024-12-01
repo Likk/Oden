@@ -77,7 +77,7 @@ method as_content_with_mention() :Return(Str) {
 =cut
 
 method is_empty() :Return(Bool) {
-    return $self->message ? 0 : 1;
+    return $self->message ? false : true;
 }
 
 =head2 add_mention

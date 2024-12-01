@@ -1,7 +1,7 @@
-use strict;
-use warnings;
-
-use Test::Spec;
+use 5.40.0;
+use autodie;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use File::Temp qw/tempdir/;
 use Oden::Entity::CommunicationReceiver;
@@ -11,12 +11,11 @@ local $ENV{DICT_DIR} = tempdir( CLEANUP => 1 );
 
 describe 'about Oden::Command::Dictionary#run' => sub {
     my $hash;
-    share %$hash;
 
-    context 'message prefix `get`' => sub {
+    describe 'message prefix `get`' => sub {
         # Negative testing
-        context 'case message pattern is `get` only. no key, no value' => sub {
-            before all => sub {
+        describe 'case message pattern is `get` only. no key, no value' => sub {
+            before_all "setup CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => 'get',
                     guild_id => 1,
@@ -32,8 +31,8 @@ describe 'about Oden::Command::Dictionary#run' => sub {
         };
 
         # Positive testing
-        context 'case message pattern is `get <key>`' => sub {
-            before all => sub {
+        describe 'case message pattern is `get <key>`' => sub {
+            before_all "setup CommunicationReceiver" => sub {
                 my $receiver = Oden::Entity::CommunicationReceiver->new(
                     message  => 'get foo',
                     guild_id => 1,
@@ -42,29 +41,37 @@ describe 'about Oden::Command::Dictionary#run' => sub {
                 $hash->{receiver} = $receiver;
 
             };
-            context 'case success' => sub {
-                before all => sub {
-                    $hash->{mock}->{dict} = Oden::Model::Dictionary->stubs('get', sub {
-                        return 'bar';
-                    });
+            describe 'case success' => sub {
+                before_all "mockup Oden::Model::Dictionary" => sub {
+                    $hash->{mock}->{dict} = mock "Oden::Model::Dictionary" => (
+                        override => [
+                            get => sub {
+                                return 'bar';
+                            },
+                        ],
+                    );
                 };
 
                 it 'when returns undef' => sub {
                     my $entity = Oden::Command::Dictionary->run($hash->{receiver});
-                    isa_ok $entity, 'Oden::Entity::CommunicationEmitter', 'instance is Oden::Entity::CommunicationEmitter';
+                    isa_ok $entity,             ['Oden::Entity::CommunicationEmitter'], 'instance is Oden::Entity::CommunicationEmitter';
                     is     $entity->as_content, 'bar', 'get value';
                 };
             };
-            context 'case failure' => sub {
-                before all => sub {
-                    $hash->{mock}->{dict} = Oden::Model::Dictionary->stubs('get', sub {
-                        return undef;
-                    });
+            describe 'case failure' => sub {
+                before_all "mockup Oden::Model::Dictionary" => sub {
+                    $hash->{mock}->{dict} = mock "Oden::Model::Dictionary" => (
+                        override => [
+                            get => sub {
+                                return undef;
+                            },
+                        ],
+                    );
                 };
 
                 it 'when returns undef' => sub {
                     my $entity = Oden::Command::Dictionary->run($hash->{receiver});
-                    isa_ok $entity, 'Oden::Entity::CommunicationEmitter', 'instance is Oden::Entity::CommunicationEmitter';
+                    isa_ok $entity,             ['Oden::Entity::CommunicationEmitter'], 'instance is Oden::Entity::CommunicationEmitter';
                     is     $entity->as_content, 'not registrated', 'failed to get';
                 };
             };
@@ -73,4 +80,4 @@ describe 'about Oden::Command::Dictionary#run' => sub {
 
 };
 
-runtests();
+done_testing();

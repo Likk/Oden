@@ -1,19 +1,16 @@
-use strict;
-use warnings;
-use utf8;
-
-use Test::Spec;
-use Test::Exception;
-use Test::Warn;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::ClassicCompare qw/is_deeply/;
+use Test2::Tools::Spec;
+use Test2::Tools::Warnings;
 
 use String::Random;
 use Oden::API::LodestoneNews;
 
 describe 'about Oden::API::LodestoneNews#list' => sub {
     my $hash;
-    share %$hash;
 
-    before all => sub {
+    before_all "setup news data" => sub {
         # create response data.
         my $news = +{};
         for my $locale (qw/na eu fr de jp/) {
@@ -38,61 +35,88 @@ describe 'about Oden::API::LodestoneNews#list' => sub {
         $hash->{news} = $news;
     };
 
-    context "Negative testing" => sub {
-        context "HTTP::Request resopnse is not 200" => sub {
-            before all => sub {
-                $hash->{stubs}->{furlResponse} = Furl::Response->stubs(+{
-                    is_success => sub { return 0 },
-                    message    => sub { return '503 Service Unavailable' },
-                });
+    describe "Negative testing" => sub {
+        describe "HTTP::Request resopnse is not 200" => sub {
+            before_all "mock request" => sub {
+                $hash->{mocks}->{FurlRequest} = mock "Furl" => (
+                    override => [
+                        request => sub {
+                            Furl::Response->new(
+                                503,
+                                '503 Service Unavailable',
+                                "Service Unavailable",
+                                +{
+                                    'content-type' => 'application/json'
+                                },
+                                q|{"message": "503 Service Unavailable", "code": 0}|
+                            );
+                        },
+                    ],
+                );
             };
 
-            after all => sub {
-                delete $hash->{stubs}->{furlResponse};
+            after_all "mock request" => sub {
+                delete $hash->{mocks}->{furlResponse};
             };
 
             it 'return error message' => sub {
-                warning_like {
+                my $warn = warning {
                     my $res = Oden::API::LodestoneNews->list();
                     is_deeply $res, +{}, 'return empty hash';
-                } qr/503 Service Unavailable/;
+                };
+                like $warn, qr/503 Service Unavailable/;
             };
         };
 
-        context "HTTP::Request resopnse is not JSON" => sub {
-            before all => sub {
-                $hash->{stubs}->{furlResponse} = Furl::Response->stubs(+{
-                    content    => sub { return 'not json' }
-                });
+        describe "HTTP::Request resopnse is not JSON" => sub {
+            before_all "mock request" => sub {
+                $hash->{mocks}->{FurlRequest} = mock "Furl" => (
+                    override => [
+                        request => sub {
+                            Furl::Response->new(
+                                200,
+                                '200 OK',
+                                "OK",
+                                +{
+                                    'content-type' => 'application/json'
+                                },
+                                q|not json|
+                            );
+                        },
+                    ],
+                );
             };
 
-            after all => sub {
-                delete $hash->{stubs}->{furlResponse};
+            after_all "mock request" => sub {
+                delete $hash->{mocks}->{furlResponse};
             };
 
             it 'return error message' => sub {
-                warning_like {
+                my $warn = warning {
                     my $res = Oden::API::LodestoneNews->list();
                     is_deeply $res, +{}, 'return empty hash';
-                } qr/'null' expected, at character offset 0 \(before "not json"\)/;
+                };
+                like $warn, qr/'null' expected, at character offset 0 \(before "not json"\)/;
             };
         };
     };
 
-    context "Positive testing" => sub {
-        context 'default parametor' => sub {
-            before all => sub {
-                $hash->{stubs}->{_request} = Oden::API::LodestoneNews->stubs(+{
-                    _request => sub {
-                        $hash->{requset_url} = $_[1];
-                        return +{
-                        };
-                    },
-                });
+    describe "Positive testing" => sub {
+        describe 'default parametor' => sub {
+            before_all "mock request" => sub {
+                $hash->{mocks}->{_request} = mock "Oden::API::LodestoneNews" => (
+                    override => [
+                        _request => sub {
+                            $hash->{requset_url} = $_[1];
+                            return +{
+                            };
+                        },
+                    ],
+                );
             };
 
-            after all => sub {
-                delete $hash->{stubs}->{_request};
+            after_all "mock request"=> sub {
+                delete $hash->{mocks}->{_request};
             };
 
             it 'category is all, locale is na, limit is 20' => sub {
@@ -102,37 +126,40 @@ describe 'about Oden::API::LodestoneNews#list' => sub {
             };
         };
 
-        context 'set parametor' => sub {
-            before all => sub {
-                $hash->{stubs}->{_request} = Oden::API::LodestoneNews->stubs(+{
-                    _request => sub {
-                        my ($self, $url) = @_;
-                        if( $url =~ m{^https://lodestonenews.com/news/(all|topics|notices|maintenance|updates|status|developers)\?locale=(na|eu|fr|de|jp)&limit=(\d+)$} ) {
-                            my ($category, $locale, $limit) = ($1, $2, $3);
-                            my $news = $hash->{news};
-                            for my $locale (qw/na eu fr de jp/) {
-                                for my $category (qw/topics notices maintenance updates status developers/) {
-                                    $#{$news->{$locale}->{$category}} = $limit - 1;
+        describe 'set parametor' => sub {
+            before_all "mock request and response news data" => sub {
+                $hash->{mocks}->{_request} = mock "Oden::API::LodestoneNews" => (
+                    override => [
+                        _request => sub {
+                            my ($self, $url) = @_;
+                            if( $url =~ m{^https://lodestonenews.com/news/(all|topics|notices|maintenance|updates|status|developers)\?locale=(na|eu|fr|de|jp)&limit=(\d+)$} ) {
+                                my ($category, $locale, $limit) = ($1, $2, $3);
+                                my $news = $hash->{news};
+                                for my $locale (qw/na eu fr de jp/) {
+                                    for my $category (qw/topics notices maintenance updates status developers/) {
+                                        $#{$news->{$locale}->{$category}} = $limit - 1;
+                                    }
                                 }
+                                my $locale_news = $category eq 'all' ? $news->{$locale} : $news->{$locale}->{$category};
+                                return $locale_news;
                             }
-                            my $locale_news = $category eq 'all' ? $news->{$locale} : $news->{$locale}->{$category};
-                            return $locale_news;
-                        }
-                        return +{};
-                    },
-                });
+                            return +{};
+                        },
+                    ],
+                );
             };
 
-            after all => sub {
-                delete $hash->{stubs}->{_request};
+            after_all "mock request and response news data" => sub {
+                delete $hash->{mocks}->{_request};
             };
-            context 'category value' => sub {
+
+            describe 'category value' => sub {
                 it 'all' => sub {
                     my $res = Oden::API::LodestoneNews->list('all');
                     is_deeply $res, $hash->{news}->{na};
                 };
 
-                they 'topics', 'notices', 'maintenance', 'updates', 'status', 'developers' => sub {
+                tests "'topics', 'notices', 'maintenance', 'updates', 'status', 'developers'" => sub {
                     for my $category (qw/topics notices maintenance updates status developers/) {
                         my $res = Oden::API::LodestoneNews->list($category);
                         is_deeply $res, +{ $category => $hash->{news}->{na}->{$category} }, sprintf('category is %s', $category);
@@ -140,8 +167,8 @@ describe 'about Oden::API::LodestoneNews#list' => sub {
                 };
             };
 
-            context 'locale value' => sub {
-                they 'na', 'eu', 'fr', 'de', 'jp' => sub {
+            describe 'locale value' => sub {
+                tests "'na', 'eu', 'fr', 'de', 'jp'" => sub {
                     for my $locale (qw/na eu fr de jp/) {
                         my $res = Oden::API::LodestoneNews->list('all', $locale);
                         is_deeply $res, $hash->{news}->{$locale}, sprintf('locale is %s', $locale);
@@ -149,17 +176,16 @@ describe 'about Oden::API::LodestoneNews#list' => sub {
                 };
             };
 
-            context 'limit value' => sub {
-                they '1..20' => sub {
+            describe 'limit value' => sub {
+                tests '1..20' => sub {
                     for my $limit (1..20) {
                         my $res = Oden::API::LodestoneNews->list('all', 'na', $limit);
                         is scalar @{$res->{topics}}, $limit, sprintf('limit is %d', $limit);
                     };
                 };
             };
-
         };
     };
 };
 
-runtests();
+done_testing();

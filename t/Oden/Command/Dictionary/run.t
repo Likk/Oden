@@ -1,8 +1,6 @@
-use strict;
-use warnings;
-
-use Test::Exception;
-use Test::Spec;
+use 5.40.0;
+use Test2::V0;
+use Test2::Tools::Spec;
 
 use File::Temp qw/tempdir/;
 use Oden::Entity::CommunicationReceiver;
@@ -12,10 +10,9 @@ local $ENV{DICT_DIR} = tempdir( CLEANUP => 1 );
 
 describe 'about Oden::Command::Dictionary#run' => sub {
     my $hash;
-    share %$hash;
 
-    context 'case no parametor' => sub {
-        before all => sub {
+    describe 'case no parametor' => sub {
+        before_all "setup CommunicationReceiver" => sub {
             my $receiver = Oden::Entity::CommunicationReceiver->new(
                 message  => '',
                 guild_id => 1,
@@ -25,14 +22,16 @@ describe 'about Oden::Command::Dictionary#run' => sub {
         };
 
         it 'when throws exception' => sub {
-            throws_ok {
+            my $throws = dies {
                 Oden::Command::Dictionary->run();
-            } qr/Too few arguments for fun run/;
+            };
+
+            like $throws, qr/Too few arguments for fun run/;
         };
     };
 
-    context 'case message is ""' => sub {
-        before all => sub {
+    describe 'case message is ""' => sub {
+        before_all "setup CommunicationReceiver" => sub {
             my $receiver = Oden::Entity::CommunicationReceiver->new(
                 message  => '',
                 guild_id => 1,
@@ -47,8 +46,8 @@ describe 'about Oden::Command::Dictionary#run' => sub {
         };
     };
 
-    context 'case message is mistake prefix' => sub {
-        before all => sub {
+    describe 'case message is mistake prefix' => sub {
+        before_all "]etup CommunicationReceiver" => sub {
             my $receiver = Oden::Entity::CommunicationReceiver->new(
                 message  => 'regist',
                 guild_id => 1,
@@ -65,4 +64,4 @@ describe 'about Oden::Command::Dictionary#run' => sub {
 
 };
 
-runtests();
+done_testing();
