@@ -5,7 +5,17 @@ use AnyEvent::Discord;
 use Function::Parameters;
 use Function::Return;
 
-use Oden::AnyEvent::Discord;
+BEGIN {
+    #XXX: `no warnings 'redefine'` is not working from Kavorka::Sub#L80
+    local $SIG{__WARN__} = sub {
+    my $message = shift;
+        return if $message =~ /AnyEvent::Discord::_discord_identify redefined/;
+        return if $message =~ /AnyEvent::Discord::_lookup_gateway redefined/;
+    };
+    require Oden::AnyEvent::Discord;
+    Oden::AnyEvent::Discord->import;
+}
+
 use Oden::Bot::Discord::Ready;
 use Oden::Bot::Discord::MessageCreate;
 use Oden::Bot::Discord::MessageUpdate;
