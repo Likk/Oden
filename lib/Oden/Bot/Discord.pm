@@ -5,6 +5,7 @@ use AnyEvent::Discord;
 use Function::Parameters;
 use Function::Return;
 
+use Oden::AnyEvent::Discord;
 use Oden::Bot::Discord::Ready;
 use Oden::Bot::Discord::MessageCreate;
 use Oden::Bot::Discord::MessageUpdate;
