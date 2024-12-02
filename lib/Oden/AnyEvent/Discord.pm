@@ -47,6 +47,14 @@ use Moops;
 =cut
 
 class AnyEvent::Discord 0.7 {
+
+    #XXX: `no warnings 'redefine'` is not working from Kavorka::Sub#L80
+    local $SIG{__WARN__} = sub {
+    my $message = shift;
+        return if $message =~ /AnyEvent::Discord::_discord_identify redefined/;
+        return if $message =~ /AnyEvent::Discord::_lookup_gateway redefined/;
+    };
+
     use AnyEvent::Discord::Payload;
 
     method update_status(HashRef $data,) {
