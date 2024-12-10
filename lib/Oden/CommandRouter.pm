@@ -5,10 +5,8 @@ no warnings 'experimental::builtin';
 
 use Function::Parameters;
 use Function::Return;
-use Tie::RegexpHash;
-use Types::Standard -types;
 use Module::Pluggable::Object;
-;#search_path => ['Oden::Command'], require => 1;
+use Types::Standard -types;
 
 =encoding utf8
 
