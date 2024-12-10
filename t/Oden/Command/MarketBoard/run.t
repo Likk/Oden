@@ -69,6 +69,9 @@ describe 'about Oden::Command::MarketBoard#run' => sub {
 
         describe 'case successful' => sub {
             before_all "mockup Oden::API::Universalis" => sub {
+                # XXX: created Oden::Model::Item#lookup_item_by_name method at import time.
+                use Module::Load qw(autoload);
+                autoload(Oden::Model::Item);
                 my $mocks = +{
                     oden_model_item => mock("Oden::Model::Item" => (
                         override => [

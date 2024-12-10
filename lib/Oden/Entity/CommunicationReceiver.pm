@@ -1,11 +1,9 @@
+package Oden::Entity::CommunicationReceiver;
 use 5.40.0;
-use experimental 'class';
 
-class Oden::Entity::CommunicationReceiver {
-    field $message  :param :reader;
-    field $guild_id :param :reader;
-    field $username :param :reader;
-};
+use Function::Parameters;
+use Function::Return;
+use Types::Standard -types;
 
 =head1 NAME
 
@@ -54,3 +52,8 @@ class Oden::Entity::CommunicationReceiver {
 =back
 
 =cut
+
+use Class::Accessor::Lite (
+    new => 1,
+    rw  => [qw/message guild_id username/],
+);

@@ -3,11 +3,11 @@ use 5.40.0;
 
 use Function::Parameters;
 use Function::Return;
+use Module::Load qw(autoload);
 use Number::Format;
 
 use Oden::API::Universalis;
 use Oden::Entity::CommunicationEmitter;
-use Oden::Model::Item;
 
 use Types::Standard -types;
 
@@ -43,6 +43,20 @@ our $PARSE_MARKET_PATTERN = qr{
 
 =head1 METHODS
 
+=head2 command_type
+
+  Any of `active`, `fast_passive` and `passive`
+
+=cut
+
+fun command_type(ClassName $class) : Return(Str) {
+    return 'active';
+}
+
+fun command_list(ClassName $class) : Return(ArrayRef[Str]) {
+    return [qw/market/];
+}
+
 =head2 run
 
   Its main talking method.
@@ -55,6 +69,9 @@ fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) : Retur
 
     my ($world_or_dc, $hq_flag, $item_name) = $class->parse_message($hear);
     return $entity unless $item_name;
+
+    #XXX: autoload called only once.
+    state $loaded = sub { autoload(Oden::Model::Item); return true }->();
 
     my $item = Oden::Model::Item->lookup_item_by_name($item_name);
     return $entity unless $item;

@@ -6,9 +6,8 @@ use feature qw(try);
 use Function::Parameters;
 use Function::Return;
 
-use Oden::Command::AYT;
 use Oden::Entity::CommunicationReceiver;
-use Oden::Dispatcher;
+use Oden::CommandRouter;
 
 use Types::Standard -types;
 
@@ -37,7 +36,7 @@ use constant {
 =head2 talk
 
   talk method is a main logic of chat bot.
-  It create a receiver object and dispatch a command.
+  It create a receiver object and route a command.
   It returns a emitter object.
 
   Args:
@@ -53,32 +52,36 @@ use constant {
 method talk(Str $content, Int $guild_id, Str $username) :Return(Maybe[Str]|Oden::Entity::CommunicationEmitter) {
     return undef unless $content;
 
-    # ping.
-    if(my $res = Oden::Command::AYT->run($content)){
-        return $res;
-    }
-
-    my ($command, $message);
-    if($content =~ m{\A/(?<command>\w+)(?:\s+(?<message>.*))?\z}){
-        $command = $+{command} || '';
-        $message = $+{message} || '';
-    }
-    return undef unless $command;
-
-    my $package = Oden::Dispatcher->dispatch($command);
-    return undef unless $package;
-
-    my $entity = Oden::Entity::CommunicationReceiver->new(
-        message  => $message,
+    my $command_router = Oden::CommandRouter->new();
+    my $receiver       = Oden::Entity::CommunicationReceiver->new(
+        message  => $content,
         guild_id => $guild_id,
         username => $username,
     );
 
-    try {
-        my $emitter =  $package->run($entity);
-        return $emitter;
+    # Automatically responds to chat messages not starting with '/'.
+    # Fas paassive commands take precedence over '/'-initiated commands
+    my $fast_passive_commands = $command_router->fast_passive_commands;
+    for my $command (@$fast_passive_commands){
+        my $emitter = $command->run($receiver);
+        return $emitter if $emitter;
     }
-    catch ($e){
-        warn $e;
-    };
+
+    # Responds to chat messages starting with '/'.
+    my ($command, $message);
+    if($content =~ m{\A/(?<command>\w+)(?:\s+(?<message>.*))?\z}){
+        $command = $+{command} || '';
+        $message = $+{message} || '';
+        if(my $command = $command_router->route_active($command)){
+            $receiver->message($message);
+            my $emitter = $command->run($receiver);
+            return $emitter if $emitter;
+        }
+    }
+
+    # TODO:
+    # Automatically responds to chat messages not starting with '/'.
+    # passive commands is lower priority than passive commands
+
+    return undef;
 }
