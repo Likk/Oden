@@ -27,7 +27,7 @@ use Types::Standard -types;
 
   Creates and returns a new CommunicationReceiver object.
 
-  Required Args:
+  Args:
     HashRef:
       message  => Str
       guild_id => Int
@@ -49,11 +49,15 @@ use Types::Standard -types;
 
   This accessor represents the username of the sender of the message.
 
+=item B<user_id>
+
+  This accessor represents the user'id of the sender of the message.
+
 =back
 
 =cut
 
 use Class::Accessor::Lite (
     new => 1,
-    rw  => [qw/message guild_id username/],
+    rw  => [qw/message guild_id username user_id/],
 );
