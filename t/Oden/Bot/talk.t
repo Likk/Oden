@@ -3,6 +3,8 @@ use Test2::V0;
 use Test2::Tools::Spec;
 
 use Oden::Bot;
+use Oden::Entity::CommunicationEmitter;
+use Oden::Entity::CommunicationReceiver;
 
 describe 'about Oden::Bot#talk' => sub {
     my $hash = {};
@@ -16,37 +18,40 @@ describe 'about Oden::Bot#talk' => sub {
                 like $throw, qr/Too few arguments for method talk/;
             };
         };
-        describe 'when content is not set' => sub {
-            it 'should exception' => sub {
+        describe 'when arguments is not Oden::Entity::CommunicationReceiver' => sub {
+            it 'should exception (undef)' => sub {
                 my $throw = dies {
-                    Oden::Bot->talk(undef, 1, 'username');
+                    Oden::Bot->talk(undef);
                 };
-                like $throw, qr/did not pass type constraint "Str"/;
+                like $throw, qr/did not pass type constraint \(not isa Oden::Entity::CommunicationReceiver\)/;
             };
-        };
-        describe 'when guild_id is not set' => sub {
-            it 'should exception' => sub {
+
+            it 'should exception (Str)' => sub {
                 my $throw = dies {
-                    Oden::Bot->talk('content', undef, 'username');
+                    Oden::Bot->talk('content');
                 };
-                like $throw, qr/did not pass type constraint "Int"/;
+                like $throw, qr/did not pass type constraint \(not isa Oden::Entity::CommunicationReceiver\)/;
             };
-        };
-        describe 'when username is not set' => sub {
-            it 'should exception' => sub {
+
+            it 'should exception (Other Object)' => sub {
                 my $throw = dies {
-                    Oden::Bot->talk('content', 1, undef);
+                    Oden::Bot->talk(Oden::Entity::CommunicationEmitter->new);
                 };
-                like $throw, qr/did not pass type constraint "Str"/;
+                like $throw, qr/did not pass type constraint \(not isa Oden::Entity::CommunicationReceiver\)/;
             };
         };
     };
 
     describe 'Positive testing' => sub {
         describe 'when parameter is set' => sub {
-            describe 'when content is ""' => sub {
+            describe 'when message is ""' => sub {
                 it 'should return undef' => sub {
-                    my $res = Oden::Bot->talk('', 1, 'username');
+                    my $entity = Oden::Entity::CommunicationReceiver->new(
+                        message => '',
+                        guild_id => 1,
+                        username => 'username',
+                    );
+                    my $res = Oden::Bot->talk($entity);
                     is $res, undef, 'no response';
                 };
             };
@@ -73,7 +78,12 @@ describe 'about Oden::Bot#talk' => sub {
                     };
                 };
                 it 'should return response' => sub {
-                    my $res = Oden::Bot->talk('/Dummy', 1, 'username');
+                    my $entity = Oden::Entity::CommunicationReceiver->new(
+                        message => '/Dummy',
+                        guild_id => 1,
+                        username => 'username',
+                    );
+                    my $res = Oden::Bot->talk($entity);
                     is $res, 'response SlashCommand', 'response is "response SlashCommand"';
                 };
             };

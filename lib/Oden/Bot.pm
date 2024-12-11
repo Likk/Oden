@@ -12,7 +12,8 @@ use Oden::CommandRouter;
 use Types::Standard -types;
 
 use constant {
-    "Oden::Entity::CommunicationEmitter" => InstanceOf['Oden::Entity::CommunicationEmitter'],
+    "Oden::Entity::CommunicationReceiver" => InstanceOf['Oden::Entity::CommunicationReceiver'],
+    "Oden::Entity::CommunicationEmitter"  => InstanceOf['Oden::Entity::CommunicationEmitter'],
 };
 
 =encoding utf8
@@ -40,24 +41,17 @@ use constant {
   It returns a emitter object.
 
   Args:
-    Str $content
-    Int $guild_id
-    Str $username
+    Oden::Entity::CommunicationReceiver
 
   Returns:
     Maybe[Str]|Oden::Entity::CommunicationEmitter
 
 =cut
 
-method talk(Str $content, Int $guild_id, Str $username) :Return(Maybe[Str]|Oden::Entity::CommunicationEmitter) {
-    return undef unless $content;
-
+method talk(Oden::Entity::CommunicationReceiver $receiver) :Return(Maybe[Str]|Oden::Entity::CommunicationEmitter) {
+    my $content        = $receiver->message;
     my $command_router = Oden::CommandRouter->new();
-    my $receiver       = Oden::Entity::CommunicationReceiver->new(
-        message  => $content,
-        guild_id => $guild_id,
-        username => $username,
-    );
+    return undef unless $content;
 
     # Automatically responds to chat messages not starting with '/'.
     # Fas paassive commands take precedence over '/'-initiated commands

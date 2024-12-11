@@ -7,6 +7,7 @@ use Function::Return;
 
 use Oden::API::Discord;
 use Oden::Bot;
+use Oden::Entity::CommunicationReceiver;
 use Oden::Logger;
 
 use Types::Standard -types;
@@ -60,12 +61,14 @@ fun message_create(AnyEvent::Discord $client, HashRef $data, @args) :Return(Bool
     );
     $logger->say(Encode::encode_utf8($message));
 
-    my $res = Oden::Bot->talk(
-        $content,
-        $data->{guild_id},
-        $data->{author}->{username}
-    );
+    my $receiver = Oden::Entity::CommunicationReceiver->new(+{
+        message  => $content,
+        guild_id => $data->{guild_id},
+        username => $data->{author}->{username},
+        user_id  => $data->{author}->{id},
+    });
 
+    my $res = Oden::Bot->talk($receiver);
     return false unless($res);
 
     # レスポンスが Oden::Response::Dictionary の場合はファイルを添付して送信
