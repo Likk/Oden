@@ -35,11 +35,15 @@ our $PROCESS = [qw/
     出汁
     煮込み
     寝かせ
+    和辛子
+    今日おでん食べた？
 /];
 
 =item B<INGREDIENTS>
 
   ingredients list.
+
+=back
 
 =cut
 
@@ -61,6 +65,7 @@ our $INGREDIENTS = [qw/
     つみれ
     はんぺん
     餅巾着
+    君がロールキャベツをいれるなら
 /];
 
 =back
