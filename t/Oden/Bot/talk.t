@@ -52,26 +52,28 @@ describe 'about Oden::Bot#talk' => sub {
             };
             describe 'when content is "slashCommand"' => sub {
                 before_all 'create mock' => sub {
-                    $hash->{mock} = mock "Oden::Dispatcher" => (
-                        override => [
-                            dispatch => sub {
-                                my ($class, $command) = @_;
-                                my $package = sprintf('Oden::Command::%s', ucfirst($command));
-                                my $self =  bless {} , $package;
-
-                                no strict 'refs';
-                                my $subname = sprintf("%s::run", $package);
-                                *{$subname} = sub {
-                                    return sprintf("response %s", $command);
-                                };
-
-                                return $self;
-                            }
-                        ]
-                    );
+                    $hash->{mock} = +{
+                        command_router =>  mock("Oden::CommandRouter" => (
+                            override => [
+                                setup => sub {
+                                    return 1;
+                                },
+                                route_active => sub {
+                                    return 'Oden::Command::Dummy';
+                                },
+                            ]
+                        )),
+                        command_dummy => mock("Oden::Command::Dummy" => (
+                            add => [
+                                run => sub {
+                                    return 'response SlashCommand';
+                                },
+                            ]
+                        )),
+                    };
                 };
                 it 'should return response' => sub {
-                    my $res = Oden::Bot->talk('/SlashCommand', 1, 'username');
+                    my $res = Oden::Bot->talk('/Dummy', 1, 'username');
                     is $res, 'response SlashCommand', 'response is "response SlashCommand"';
                 };
             };

@@ -3,8 +3,8 @@ use 5.40.0;
 
 use Function::Parameters;
 use Function::Return;
+use Module::Load qw(autoload);
 use Oden::Entity::CommunicationEmitter;
-use Oden::Model::Item;
 use Types::Standard -types;
 
 use constant {
@@ -24,6 +24,20 @@ use constant {
 
 =head1 METHODS
 
+=head2 command_type
+
+  Any of `active`, `fast_passive` and `passive`
+
+=cut
+
+fun command_type(ClassName $class) : Return(Str) {
+    return 'active';
+}
+
+fun command_list(ClassName $class) : Return(ArrayRef[Str]) {
+    return [qw/fishing/];
+}
+
 =head2 run
 
   Its main talking method.
@@ -35,6 +49,10 @@ fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) : Retur
     my $entity = Oden::Entity::CommunicationEmitter->new();
 
     return $entity unless $hear;
+
+    #XXX: autoload called only once.
+    my $loaded = sub { autoload(Oden::Model::Item); return true }->();
+
     if(my $item = Oden::Model::Item->lookup_item_by_name($hear)){
         $entity->message(
             sprintf("teamcraft: %s\n", $item->ffxivteamcraft_url)

@@ -8,13 +8,19 @@
 require anyenv, gcc, libssl-dev or libcrypt-ssleay-perl.
 
 ```
-$ git clone git@github.com:Likk/Oden.git ./Oden
+$ git clone git@github.com:Likk/Oden.git
 $ cd ./Oden
 $ anyenv install plenv
 $ cat .perl-version | xargs plenv install
 $ ./env.sh plenv install-cpanm
 $ ./env.sh cpanm App::cpm
 $ ./env.sh cpm install
+```
+
+### setup submodules
+
+```
+git submodule update --init --recursive
 ```
 
 ## edit your bot configure

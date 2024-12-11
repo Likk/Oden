@@ -24,13 +24,30 @@ use constant {
 
 =head1 METHODS
 
+=head2 command_type
+
+  Any of `active`, `fast_passive` and `passive`
+
+=cut
+
+fun command_type(ClassName $class) : Return(Str) {
+    return 'active';
+}
+
+fun command_list(ClassName $class) : Return(ArrayRef[Str]) {
+    return [qw/
+        choice
+        place
+    /];
+}
+
 =head2 run
 
   Its main talking method.
 
 =cut
 
-fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) : Return(Oden::Entity::CommunicationEmitter) {
+fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) :Return(Oden::Entity::CommunicationEmitter) {
     my $message = $receiver->message;
     my $entity  = Oden::Entity::CommunicationEmitter->new();
 

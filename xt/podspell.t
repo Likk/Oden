@@ -15,6 +15,9 @@ all_pod_files_spelling_ok('lib');
 __DATA__
 # annotation
 XXX
+# Author
+Likkradyus
+li que
 # Oden::Logger
 critf
 warnf
