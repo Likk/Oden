@@ -71,11 +71,18 @@ method setup() :Return(Bool) {
         my $command_type =  $package->command_type();
         my $command_list =  $package->command_list();
 
-        # passive commands
+        # fast passive commands
         if($command_type eq 'fast_passive'){
             my $route_fast_passive = $self->fast_passive_commands() || [];
             push @$route_fast_passive, $package;
             $self->fast_passive_commands($route_fast_passive);
+        }
+
+        # passive commands
+        if($command_type eq 'passive'){
+            my $route_passive = $self->passive_commands() || [];
+            push @$route_passive, $package;
+            $self->passive_commands($route_passive);
         }
 
         # active commands

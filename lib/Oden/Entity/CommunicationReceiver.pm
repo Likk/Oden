@@ -32,6 +32,7 @@ use Types::Standard -types;
       message  => Str
       guild_id => Int
       username => Str
+      user_id  => Int
 
 =head1 Accessor
 

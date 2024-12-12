@@ -73,9 +73,13 @@ method talk(Oden::Entity::CommunicationReceiver $receiver) :Return(Maybe[Str]|Od
         }
     }
 
-    # TODO:
     # Automatically responds to chat messages not starting with '/'.
     # passive commands is lower priority than passive commands
+    my $passive_commands = $command_router->passive_commands;
+    for my $command (@$passive_commands){
+        my $emitter = $command->run($receiver);
+        return $emitter if $emitter;
+    }
 
     return undef;
 }
