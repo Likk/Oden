@@ -10,7 +10,7 @@ export LANG="C";
 export DATA_DIR="t/data"
 
 if [ $# -gt 0 ]; then
-  forkprove -vr $1
+  forkprove -lvr $1
 else
-  forkprove -r ./t
+  forkprove -lr ./t
 fi

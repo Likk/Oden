@@ -7,13 +7,13 @@ use Module::Load qw(autoload);
 use Number::Format;
 
 use Oden::API::Universalis;
-use Oden::Entity::CommunicationEmitter;
+use Dashi::Entity::CommunicationEmitter;
 
 use Types::Standard -types;
 
 use constant {
-    "Oden::Entity::CommunicationReceiver" => InstanceOf['Oden::Entity::CommunicationReceiver'],
-    "Oden::Entity::CommunicationEmitter"  => InstanceOf['Oden::Entity::CommunicationEmitter'],
+    "Dashi::Entity::CommunicationReceiver" => InstanceOf['Dashi::Entity::CommunicationReceiver'],
+    "Dashi::Entity::CommunicationEmitter"  => InstanceOf['Dashi::Entity::CommunicationEmitter'],
 };
 
 =head1 NAME
@@ -63,9 +63,9 @@ fun command_list(ClassName $class) : Return(ArrayRef[Str]) {
 
 =cut
 
-fun run(ClassName $class, Oden::Entity::CommunicationReceiver $receiver) : Return(Oden::Entity::CommunicationEmitter) {
+fun run(ClassName $class, Dashi::Entity::CommunicationReceiver $receiver) : Return(Dashi::Entity::CommunicationEmitter) {
     my $hear   = $receiver->message || '';
-    my $entity = Oden::Entity::CommunicationEmitter->new();
+    my $entity = Dashi::Entity::CommunicationEmitter->new();
 
     my ($world_or_dc, $hq_flag, $item_name) = $class->parse_message($hear);
     return $entity unless $item_name;

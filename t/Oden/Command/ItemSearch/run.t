@@ -2,7 +2,7 @@ use 5.40.0;
 use Test2::V0;
 use Test2::Tools::Spec;
 
-use Oden::Entity::CommunicationReceiver;
+use Dashi::Entity::CommunicationReceiver;
 use Oden::Command::ItemSearch;
 
 describe 'about Oden::Command::ItemSearch#run' => sub {
@@ -23,7 +23,7 @@ describe 'about Oden::Command::ItemSearch#run' => sub {
     describe 'Positive testing' => sub {
         describe 'case call run method with official name_ja' => sub {
             before_all "setup CommunicationReceiver" => sub {
-                my $receiver = Oden::Entity::CommunicationReceiver->new(
+                my $receiver = Dashi::Entity::CommunicationReceiver->new(
                     message  => 'アラグ錫貨',
                     guild_id => 1,
                     username => 'test',
@@ -39,7 +39,7 @@ describe 'about Oden::Command::ItemSearch#run' => sub {
 
         describe 'case call run method with prefix of official name_ja' => sub {
             before_all "setup CommunicationReceiver" => sub {
-                my $receiver = Oden::Entity::CommunicationReceiver->new(
+                my $receiver = Dashi::Entity::CommunicationReceiver->new(
                     message  => 'アラグ',
                     guild_id => 1,
                     username => 'test',
@@ -55,7 +55,7 @@ describe 'about Oden::Command::ItemSearch#run' => sub {
 
         describe 'case call run method with un official name_ja' => sub {
             before_all "setup CommunicationReceiver" => sub {
-                my $receiver = Oden::Entity::CommunicationReceiver->new(
+                my $receiver = Dashi::Entity::CommunicationReceiver->new(
                     message  => 'そんなものはない',
                     guild_id => 1,
                     username => 'test',

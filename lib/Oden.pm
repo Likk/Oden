@@ -4,7 +4,7 @@ use 5.40.0;
 use Function::Parameters;
 use Function::Return;
 
-use Oden::Bot::Discord;
+use Dashi::Bot::Discord;
 
 use Types::Standard -types;
 
@@ -43,7 +43,7 @@ method new(%args) :Return(InstanceOf['Oden']) {
 =cut
 
 method start() {
-    my $bot = Oden::Bot::Discord->new(
+    my $bot = Dashi::Bot::Discord->new(
         token => $self->{token},
     );
     $bot->run();

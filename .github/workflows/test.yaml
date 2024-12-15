@@ -22,10 +22,16 @@ jobs:
           perl-version: ${{ matrix.perl }}
 
       - uses: actions/checkout@v4
+
+      - name: submodule update
+        run : |
+          git submodule update --init submodules/Dashi
+
       - name: Install cpm and dependencies
         run : |
           curl -fsSL --compressed https://git.io/cpm > cpm && chmod +x cpm
-          ./cpm install -g --cpanfile cpanfile
+          ./cpm install -g --cpanfile cpanfile_dashi
+          ./cpm install -g --cpanfile cpanfile_local
 
       - name: Run tests
         run : |

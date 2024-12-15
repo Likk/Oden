@@ -11,9 +11,9 @@ describe 'about Oden#start' => sub {
         before_all "setup" => sub {
             $hash->{oden} = Oden->new(token => 'your token');
 
-            $hash->{mocks} = mock "Oden::Bot::Discord" => (
+            $hash->{mocks} = mock "Dashi::Bot::Discord" => (
                 override => [
-                    run => sub { 'called Oden::Bot::Discord#run' },
+                    run => sub { 'called Dashi::Bot::Discord#run' },
                 ],
             );
         };
@@ -22,7 +22,7 @@ describe 'about Oden#start' => sub {
             my $oden = $hash->{oden};
             isa_ok    $oden,          ['Oden'],                        'instance is Oden';
             is        $oden->{token}, 'your token',                    'token is your token';
-            is        $oden->start(), 'called Oden::Bot::Discord#run', 'called Oden::Bot::Discord#run';
+            is        $oden->start(), 'called Dashi::Bot::Discord#run', 'called Dashi::Bot::Discord#run';
         };
 
     };
