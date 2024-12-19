@@ -8,7 +8,7 @@ use Function::Return;
 use Fcntl    qw/O_RDONLY/;
 use FindBin;
 use JSON::XS qw/decode_json/;
-use Text::CSV;
+use Text::CSV_XS;
 use Tie::File;
 use Types::Standard -types;
 use URI::Escape;
@@ -74,7 +74,7 @@ sub import {
         }
     }
     unless (scalar keys %$ITEM_DATA ){
-        my $csv       = Text::CSV->new (+{ binary => 1, sep_char => ",",});
+        my $csv       = Text::CSV_XS->new (+{ binary => 1, sep_char => ",",});
         my $file_path = sprintf("%s/%s", $DATA_DIR, 'Item.csv');
         my $index     = 1;
         my $header    = [];

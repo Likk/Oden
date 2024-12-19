@@ -1,0 +1,14 @@
+requires 'Config::Pit';
+# chat operations.
+requires 'Number::Format';
+requires 'Text::CSV_XS';
+requires 'Time::Piece';
+requires 'URI::Escape';
+
+## util
+requires 'Array::Diff';
+requires 'Hash::Diff';
+requires 'HTTP::Date';
+requires 'HTTP::Parser::XS';
+requires 'Web::Query';
+requires 'WebService::Discord::Webhook';

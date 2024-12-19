@@ -7,3 +7,7 @@
 [submodule "submodules/ffxiv-teamcraft"]
 	path = submodules/ffxiv-teamcraft
 	url = https://github.com/ffxiv-teamcraft/ffxiv-teamcraft
+[submodule "submodules/Dashi"]
+	path = submodules/Dashi
+	url = https://github.com/Likk/Dashi
+	branch = main

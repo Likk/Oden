@@ -2,7 +2,6 @@ use 5.40.0;
 use Test2::V0;
 use Test2::Tools::Spec;
 
-use Oden::Entity::CommunicationReceiver;
 use Oden::Command::MarketBoard;
 
 describe 'about Oden::Command::MarketBoard#format_response' => sub {
