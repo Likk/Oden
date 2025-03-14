@@ -19,7 +19,7 @@ describe 'about Oden::Scraper::Lodestone#brand_section' => sub {
             isa_ok $lodestone,    ['Oden::Scraper::Lodestone'];
             ref_ok $res,          'HASH';
             is     $res->{url},   'http://www.jp.square-enix.com/',                                         'url correct';
-            is     $res->{image}, 'https://lds-img.finalfantasyxiv.com/h/L/cxcD5kjeM52JRVwrrzIF4dZNe0.png', 'image correct';
+            is     $res->{image}, 'https://lds-img.finalfantasyxiv.com/h/a/1LbK-2Cqoku3zorQFR0VQ6jP0Y.png', 'image correct';
             is     $res->{alt},   'SQUARE ENIX',                                                            'alt correct';
         };
     };
